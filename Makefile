@@ -50,3 +50,4 @@ commit:
 	$(FORMAT)
 	git add .
 	git commit -S -m '$(COMMENT)'
+	git push
