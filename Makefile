@@ -40,11 +40,13 @@ test:
 lint:
 	$(LINT)
 
-.PHONY: format
-format:
-	$(FORMAT)
-
 .PHONY: clean
 clean:
 	cargo clean
 	rm -f Cargo.lock
+
+.PHONY: commit
+commit:
+	$(FORMAT)
+	git add .
+	git commit -S -m '$(COMMENT)'
