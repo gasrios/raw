@@ -119,7 +119,7 @@ fn main() -> Result<(), Error> {
 
                 /*
                  * TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same meaning, this
-                 * sometimes is confusing.
+                 * is sometimes confusing.
                  */
 
                 /*

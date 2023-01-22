@@ -45,9 +45,10 @@ clean:
 	cargo clean
 	rm -f Cargo.lock
 
-.PHONY: commit
-commit:
+.PHONY: format
+format:
 	$(FORMAT)
-	git add .
-	git commit -S -m '$(COMMENT)'
-	git push
+
+.PHONY: commit
+commit: format
+	git commit -S -m '$(MESSAGE)'
