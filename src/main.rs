@@ -11,187 +11,208 @@ fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
         let mut buffered_reader: BufReader<File> = BufReader::new(File::open(file_name)?);
 
-        /*
-         * From TIFF 6.0 Specification, page 13
-         *
-         * Image File Header
-         *
-         * A TIFF file begins with an 8-byte image file header, containing the following information:
-         *
-         * Bytes 0-1: The byte order used within the file. Legal values are:
-         *            “II” (4949.H)
-         *            “MM” (4D4D.H)
-         *
-         *            In the “II” format, byte order is always from the least significant byte
-         *            to the most significant byte, for both 16-bit and 32-bit integers This is
-         *            called little-endian byte order. In the “MM” format, byte order is always
-         *            from most significant to least significant, for both 16-bit and 32-bit
-         *            integers. This is called big-endian byte order.
-         */
-        let byte_order: ByteOrder;
-        {
-            let buffer: [u8; 2] = read(&mut buffered_reader)?;
-            if buffer[0] == 0x49 && buffer[1] == 0x49 {
-                byte_order = LittleEndian;
-            } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
-                byte_order = BigEndian;
-            } else {
-                return Err(Error::new(
-                    InvalidData,
-                    format!(
-                        "Invalid byte order specification: {:?}. Legal values are “II” (4949.H) and “MM” (4D4D.H)",
-                        &buffer
-                    ),
-                ));
-            }
-        }
+        // It does not matter which value we initialize those with, we just need something so they
+        // can be passed as parameters, below. process_header() will set the right values later.
+        let mut byte_order: ByteOrder = BigEndian;
+        let mut offset: u64 = 0;
 
-        {
-            /*
-             * Bytes 2-3: An arbitrary but carefully chosen number (42) that further identifies the
-             *            file as a TIFF file.
-             *
-             *            The byte order depends on the value of Bytes 0-1.
-             */
-            let buffer: [u8; 2] = read(&mut buffered_reader)?;
-            // FIXME implement trait std::convert::From<T>
-            let version: i16 = read_i16(&buffer, byte_order).unwrap();
-            if version != 42 {
-                return Err(Error::new(
-                    InvalidData,
-                    format!("Failed to further identify the file as a TIFF file, was expecting 42, found {version}"),
-                ));
-            }
-        }
-
-        /*
-         * Bytes 4-7: The offset (in bytes) of the first IFD. The directory may be at any
-         *            location in the file after the header but must begin on a word boundary.
-         *            In particular, an Image File Directory may follow the image data it
-         *            describes. Readers must follow the pointers wherever they may lead.
-         *
-         *            The term byte offset is always used in this document to refer to a
-         *            location with respect to the beginning of the TIFF file. The first byte
-         *            of the file has an offset of 0.
-         */
-        let mut offset: u64;
-        {
-            let buffer: [u8; 4] = read(&mut buffered_reader)?;
-            // FIXME implement trait std::convert::From<T>
-            // FIXME Test offset is even
-            offset = u64::from(read_u32(&buffer, byte_order).unwrap());
-        }
-        if offset < 8 {
-            return Err(Error::new(
-                InvalidData,
-                format!("First IFD offset is smaller than header size: {offset}"),
-            ));
-        }
+        process_header(&mut buffered_reader, &mut byte_order, &mut offset)?;
 
         loop {
             println!("IFD offset: {offset}");
 
-            buffered_reader.seek(SeekFrom::Start(offset))?;
-
-            /*
-             * From TIFF 6.0 Specification, page 14
-             *
-             * Image File Directory
-             *
-             * An Image File Directory (IFD) consists of a 2-byte count of the number of directory
-             * entries (i.e., the number of fields), followed by a sequence of 12-byte field entries,
-             * followed by a 4-byte offset of the next IFD (or 0 if none). (Do not forget to write the
-             * 4 bytes of 0 after the last IFD.)
-             *
-             * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
-             */
-            let number_of_fields: u16;
-            {
-                let buffer: [u8; 2] = read(&mut buffered_reader)?;
-                // FIXME implement trait std::convert::From<T>
-                number_of_fields = read_u16(&buffer, byte_order).unwrap();
-            }
-
-            println!("Number of fields: {number_of_fields}");
-
-            for _i in 0..number_of_fields {
-                let mut entry: IfdEntry = IfdEntry::new();
-
-                /*
-                 * TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same meaning, this
-                 * is sometimes confusing.
-                 */
-
-                /*
-                 * IFD Entry
-                 *
-                 * Each 12-byte IFD entry has the following format:
-                 *
-                 * Bytes 0-1 The Tag that identifies the field.
-                 */
-                {
-                    let buffer: [u8; 2] = read(&mut buffered_reader)?;
-                    // FIXME implement trait std::convert::From<T>
-                    entry.tag = read_u16(&buffer, byte_order).unwrap();
-                }
-
-                // Bytes 2-3 The field Type.
-                {
-                    let buffer: [u8; 2] = read(&mut buffered_reader)?;
-                    // FIXME implement trait std::convert::From<T>
-                    let field_type: usize = usize::from(read_u16(&buffer, byte_order).unwrap());
-
-                    if (1..13).contains(&field_type) {
-                        entry.field_type = TYPES[field_type];
-                    } else {
-                        // See below. TYPES[0] == Unexpected
-                        entry.field_type = TYPES[0];
-                    }
-                }
-
-                // Bytes 4-7 The number of values, Count of the indicated Type.
-                {
-                    let buffer: [u8; 4] = read(&mut buffered_reader)?;
-                    // FIXME implement trait std::convert::From<T>
-                    entry.number_of_values = read_u32(&buffer, byte_order).unwrap();
-                }
-
-                /*
-                 * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
-                 *            The Value is expected to begin on a word boundary; the corresponding
-                 *            Value Offset will thus be an even number. This file offset may point
-                 *            anywhere in the file, even after the image data.
-                 */
-                {
-                    let buffer: [u8; 4] = read(&mut buffered_reader)?;
-                    // FIXME implement trait std::convert::From<T>
-                    // FIXME Test offset is even
-                    entry.offset = u64::from(read_u32(&buffer, byte_order).unwrap());
-                }
-
-                println!("Tag: {}", entry.tag);
-                println!("Field type: {:?}", entry.field_type());
-                println!("Number of values: {}", entry.number_of_values);
-                println!(
-                    "Value size: {}",
-                    entry.field_type.size_in_bytes * entry.number_of_values
-                );
-                println!("Value offset: {}", entry.offset);
-            }
-
-            {
-                let buffer: [u8; 4] = read(&mut buffered_reader)?;
-                // FIXME implement trait std::convert::From<T>
-                offset = u64::from(read_u32(&buffer, byte_order).unwrap());
-            }
+            process_ifd(&mut buffered_reader, byte_order, &mut offset)?;
 
             if offset == 0 {
                 break;
+            }
+
+            if offset % 2 == 1 {
+                return Err(Error::new(
+                    InvalidData,
+                    format!("Value offset is odd and therefore not a word boundary: {offset}"),
+                ));
             }
         }
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
+
+    Ok(())
+}
+
+fn process_header(
+    buffered_reader: &mut BufReader<File>,
+    byte_order: &mut ByteOrder,
+    offset: &mut u64,
+) -> Result<(), Error> {
+    /*
+     * From TIFF 6.0 Specification, page 13
+     *
+     * Image File Header
+     *
+     * A TIFF file begins with an 8-byte image file header, containing the following information:
+     *
+     * Bytes 0-1: The byte order used within the file. Legal values are:
+     *            “II” (4949.H)
+     *            “MM” (4D4D.H)
+     *
+     *            In the “II” format, byte order is always from the least significant byte
+     *            to the most significant byte, for both 16-bit and 32-bit integers This is
+     *            called little-endian byte order. In the “MM” format, byte order is always
+     *            from most significant to least significant, for both 16-bit and 32-bit
+     *            integers. This is called big-endian byte order.
+     */
+    let mut buffer: [u8; 2] = read(buffered_reader)?;
+    if buffer[0] == 0x49 && buffer[1] == 0x49 {
+        *byte_order = LittleEndian;
+    } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
+        *byte_order = BigEndian;
+    } else {
+        return Err(Error::new(
+            InvalidData,
+            format!(
+                "Invalid byte order specification: {:?}. Legal values are “II” (4949.H) and “MM” (4D4D.H)",
+                &buffer
+            ),
+        ));
+    }
+
+    /*
+     * Bytes 2-3: An arbitrary but carefully chosen number (42) that further identifies the
+     *            file as a TIFF file.
+     *
+     *            The byte order depends on the value of Bytes 0-1.
+     */
+    buffer = read(buffered_reader)?;
+    // FIXME implement trait std::convert::From<T>
+    let version: i16 = read_i16(&buffer, *byte_order).unwrap();
+    if version != 42 {
+        return Err(Error::new(
+            InvalidData,
+            format!("Failed to further identify the file as a TIFF file, was expecting 42, found {version}"),
+        ));
+    }
+
+    /*
+     * Bytes 4-7: The offset (in bytes) of the first IFD. The directory may be at any
+     *            location in the file after the header but must begin on a word boundary.
+     *            In particular, an Image File Directory may follow the image data it
+     *            describes. Readers must follow the pointers wherever they may lead.
+     *
+     *            The term byte offset is always used in this document to refer to a
+     *            location with respect to the beginning of the TIFF file. The first byte
+     *            of the file has an offset of 0.
+     */
+    let buffer: [u8; 4] = read(buffered_reader)?;
+    // FIXME implement trait std::convert::From<T>
+    *offset = u64::from(read_u32(&buffer, *byte_order).unwrap());
+
+    if *offset < 8 {
+        return Err(Error::new(
+            InvalidData,
+            format!("First IFD offset is smaller than header size: {}", *offset),
+        ));
+    }
+
+    if *offset % 2 == 1 {
+        return Err(Error::new(
+            InvalidData,
+            format!(
+                "Value offset is odd and therefore not a word boundary: {}",
+                *offset
+            ),
+        ));
+    }
+
+    Ok(())
+}
+
+fn process_ifd(
+    buffered_reader: &mut BufReader<File>,
+    byte_order: ByteOrder,
+    offset: &mut u64,
+) -> Result<(), Error> {
+    buffered_reader.seek(SeekFrom::Start(*offset))?;
+
+    /*
+     * From TIFF 6.0 Specification, page 14
+     *
+     * Image File Directory
+     *
+     * An Image File Directory (IFD) consists of a 2-byte count of the number of directory
+     * entries (i.e., the number of fields), followed by a sequence of 12-byte field entries,
+     * followed by a 4-byte offset of the next IFD (or 0 if none). (Do not forget to write the
+     * 4 bytes of 0 after the last IFD.)
+     *
+     * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
+     */
+    let mut buffer: [u8; 2] = read(buffered_reader)?;
+    // FIXME implement trait std::convert::From<T>
+    let number_of_fields: u16 = read_u16(&buffer, byte_order).unwrap();
+
+    println!("Number of fields: {number_of_fields}");
+
+    for _i in 0..number_of_fields {
+        let mut entry: IfdEntry = IfdEntry::new();
+
+        /*
+         * TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same meaning, this
+         * is sometimes confusing.
+         */
+
+        /*
+         * IFD Entry
+         *
+         * Each 12-byte IFD entry has the following format:
+         *
+         * Bytes 0-1 The Tag that identifies the field.
+         */
+        buffer = read(buffered_reader)?;
+        // FIXME implement trait std::convert::From<T>
+        entry.tag = read_u16(&buffer, byte_order).unwrap();
+
+        // Bytes 2-3 The field Type.
+        buffer = read(buffered_reader)?;
+        // FIXME implement trait std::convert::From<T>
+        let field_type: usize = usize::from(read_u16(&buffer, byte_order).unwrap());
+
+        if (1..13).contains(&field_type) {
+            entry.field_type = TYPES[field_type];
+        } else {
+            // See below. TYPES[13] == Unexpected
+            entry.field_type = TYPES[13];
+        }
+
+        // Bytes 4-7 The number of values, Count of the indicated Type.
+        let mut buffer: [u8; 4] = read(buffered_reader)?;
+        // FIXME implement trait std::convert::From<T>
+        entry.number_of_values = read_u32(&buffer, byte_order).unwrap();
+
+        /*
+         * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
+         *            The Value is expected to begin on a word boundary; the corresponding
+         *            Value Offset will thus be an even number. This file offset may point
+         *            anywhere in the file, even after the image data.
+         */
+        buffer = read(buffered_reader)?;
+        // FIXME implement trait std::convert::From<T>
+        // FIXME Test offset is even
+        entry.offset = u64::from(read_u32(&buffer, byte_order).unwrap());
+
+        println!("Tag: {}", entry.tag);
+        println!("Field type: {:?}", entry.field_type());
+        println!("Number of values: {}", entry.number_of_values);
+        println!(
+            "Value size: {}",
+            entry.field_type.size_in_bytes * entry.number_of_values
+        );
+        println!("Value offset: {}", entry.offset);
+    }
+
+    let buffer: [u8; 4] = read(buffered_reader)?;
+    // FIXME implement trait std::convert::From<T>
+    *offset = u64::from(read_u32(&buffer, byte_order).unwrap());
 
     Ok(())
 }
@@ -219,10 +240,8 @@ impl IfdEntry {
     fn new() -> IfdEntry {
         IfdEntry {
             tag: 0,
-            field_type: Type {
-                field_type: EnumType::Unknown,
-                size_in_bytes: 0,
-            },
+            // See below. TYPES[0] == Unknown
+            field_type: TYPES[0],
             number_of_values: 0,
             offset: 0,
         }
@@ -262,10 +281,10 @@ impl IfdEntry {
  * In order to replicate the behavior of Java enums, Rust needs a combination of enum (for match)
  * and struct (to acess property "bytes")
  */
-const TYPES: [Type; 13] = [
+const TYPES: [Type; 14] = [
     Type {
-        field_type: EnumType::Unexpected,
-        size_in_bytes: 1,
+        field_type: EnumType::Unknown,
+        size_in_bytes: 0,
     },
     Type {
         field_type: EnumType::Byte,
@@ -315,6 +334,10 @@ const TYPES: [Type; 13] = [
         field_type: EnumType::Double,
         size_in_bytes: 8,
     },
+    Type {
+        field_type: EnumType::Unexpected,
+        size_in_bytes: 1,
+    },
 ];
 
 #[derive(Clone, Copy)]
@@ -325,6 +348,7 @@ struct Type {
 
 #[derive(Clone, Copy, Debug)]
 enum EnumType {
+    Unknown,
     Byte,
     Ascii,
     Short,
@@ -337,6 +361,5 @@ enum EnumType {
     Srational,
     Float,
     Double,
-    Unknown,
     Unexpected,
 }
