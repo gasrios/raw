@@ -6,6 +6,10 @@ use std::fs::File;
 use std::io::{
     BufReader, Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom,
 };
+use Type_::{
+    Ascii, Byte, Double, Float, Long, Rational, Sbyte, Short, Slong, Srational, Sshort, Undefined,
+    Unexpected, Unknown,
+};
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
@@ -23,10 +27,22 @@ fn main() -> Result<(), Error> {
 
             process_ifd(&mut buffered_reader, byte_order, &mut offset)?;
 
+            /*
+             * From TIFF 6.0 Specification, page 14
+             *
+             * An Image File Directory (IFD) consists of (...) followed by a 4-byte offset of the
+             * next IFD (or 0 if none).
+             */
             if offset == 0 {
                 break;
             }
 
+            /*
+             * From TIFF 6.0 Specification, page 13
+             *
+             * The directory may be at any location in the file after the header but must begin on
+             * a word boundary.
+             */
             if offset % 2 == 1 {
                 return Err(Error::new(
                     InvalidData,
@@ -169,25 +185,30 @@ fn process_ifd(
          * Bytes 0-1 The Tag that identifies the field.
          */
         buffer = read(buffered_reader)?;
+        // TODO process numeric value of tag
         // FIXME implement trait std::convert::From<T>
         entry.tag = read_u16(&buffer, byte_order).unwrap();
 
-        // Bytes 2-3 The field Type.
+        /*
+         * Bytes 2-3 The field Type.
+         */
         buffer = read(buffered_reader)?;
         // FIXME implement trait std::convert::From<T>
-        let field_type: usize = usize::from(read_u16(&buffer, byte_order).unwrap());
+        let type_: usize = usize::from(read_u16(&buffer, byte_order).unwrap());
 
-        if (1..13).contains(&field_type) {
-            entry.field_type = TYPES[field_type];
+        if (1..13).contains(&type_) {
+            entry.type_ = TYPES[type_];
         } else {
             // See below. TYPES[13] == Unexpected
-            entry.field_type = TYPES[13];
+            entry.type_ = TYPES[13];
         }
 
-        // Bytes 4-7 The number of values, Count of the indicated Type.
+        /*
+         * Bytes 4-7 The number of values, Count of the indicated Type.
+         */
         let mut buffer: [u8; 4] = read(buffered_reader)?;
         // FIXME implement trait std::convert::From<T>
-        entry.number_of_values = read_u32(&buffer, byte_order).unwrap();
+        entry.count = read_u32(&buffer, byte_order).unwrap();
 
         /*
          * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
@@ -201,13 +222,40 @@ fn process_ifd(
         entry.offset = u64::from(read_u32(&buffer, byte_order).unwrap());
 
         println!("Tag: {}", entry.tag);
-        println!("Field type: {:?}", entry.field_type());
-        println!("Number of values: {}", entry.number_of_values);
-        println!(
-            "Value size: {}",
-            entry.field_type.size_in_bytes * entry.number_of_values
-        );
-        println!("Value offset: {}", entry.offset);
+        println!("\tType: {:?}", entry.type_());
+        println!("\tNumber of values: {}", entry.count);
+
+        /*
+         * From TIFF 6.0 Specification, page 15
+         *
+         * Value/Offset
+         *
+         * To save time and space the Value Offset contains the Value instead of pointing to the
+         * Value if and only if the Value fits into 4 bytes. If the Value is shorter than 4 bytes,
+         * it is left-justified within the 4-byte Value Offset, i.e., stored in the lower-numbered
+         * bytes. Whether the Value fits within 4 bytes is determined by the Type and Count of the
+         * field.
+         */
+        if entry.type_.size_in_bytes * entry.count < 5 {
+            // TODO read those values
+            match entry.type_() {
+                Byte => println!("\tType: Byte"),
+                Ascii => println!("\tType: Ascii"),
+                Short => println!("\tType: Short"),
+                Long => println!("\tType: Long"),
+                Rational => println!("\tType: Rational"),
+                Sbyte => println!("\tType: Sbyte"),
+                Undefined => println!("\tType: Undefined"),
+                Sshort => println!("\tType: Sshort"),
+                Slong => println!("\tType: Slong"),
+                Srational => println!("\tType: Srational"),
+                Float => println!("\tType: Float"),
+                Double => println!("\tType: Double"),
+                _ => println!("\tType: Other"),
+            }
+        } else {
+            println!("\tValue offset: {}", entry.offset);
+        }
     }
 
     let buffer: [u8; 4] = read(buffered_reader)?;
@@ -231,8 +279,8 @@ fn read<const BYTES2READ: usize>(r: &mut BufReader<File>) -> Result<[u8; BYTES2R
 
 struct IfdEntry {
     tag: u16,
-    field_type: Type,
-    number_of_values: u32,
+    type_: Type,
+    count: u32,
     offset: u64,
 }
 
@@ -241,14 +289,14 @@ impl IfdEntry {
         IfdEntry {
             tag: 0,
             // See below. TYPES[0] == Unknown
-            field_type: TYPES[0],
-            number_of_values: 0,
+            type_: TYPES[0],
+            count: 0,
             offset: 0,
         }
     }
 
-    fn field_type(&self) -> EnumType {
-        self.field_type.field_type
+    fn type_(&self) -> Type_ {
+        self.type_.type_
     }
 }
 
@@ -283,71 +331,71 @@ impl IfdEntry {
  */
 const TYPES: [Type; 14] = [
     Type {
-        field_type: EnumType::Unknown,
+        type_: Unknown,
         size_in_bytes: 0,
     },
     Type {
-        field_type: EnumType::Byte,
+        type_: Byte,
         size_in_bytes: 1,
     },
     Type {
-        field_type: EnumType::Ascii,
+        type_: Ascii,
         size_in_bytes: 1,
     },
     Type {
-        field_type: EnumType::Short,
+        type_: Short,
         size_in_bytes: 2,
     },
     Type {
-        field_type: EnumType::Long,
+        type_: Long,
         size_in_bytes: 4,
     },
     Type {
-        field_type: EnumType::Rational,
+        type_: Rational,
         size_in_bytes: 8,
     },
     Type {
-        field_type: EnumType::Sbyte,
+        type_: Sbyte,
         size_in_bytes: 1,
     },
     Type {
-        field_type: EnumType::Undefined,
+        type_: Undefined,
         size_in_bytes: 1,
     },
     Type {
-        field_type: EnumType::Sshort,
+        type_: Sshort,
         size_in_bytes: 2,
     },
     Type {
-        field_type: EnumType::Slong,
+        type_: Slong,
         size_in_bytes: 4,
     },
     Type {
-        field_type: EnumType::Srational,
+        type_: Srational,
         size_in_bytes: 8,
     },
     Type {
-        field_type: EnumType::Float,
+        type_: Float,
         size_in_bytes: 4,
     },
     Type {
-        field_type: EnumType::Double,
+        type_: Double,
         size_in_bytes: 8,
     },
     Type {
-        field_type: EnumType::Unexpected,
+        type_: Unexpected,
         size_in_bytes: 1,
     },
 ];
 
 #[derive(Clone, Copy)]
 struct Type {
-    field_type: EnumType,
+    type_: Type_,
     size_in_bytes: u32,
 }
 
 #[derive(Clone, Copy, Debug)]
-enum EnumType {
+enum Type_ {
     Unknown,
     Byte,
     Ascii,
