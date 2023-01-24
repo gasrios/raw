@@ -1,54 +1,42 @@
-# TODO: the correct egrep expression is '^name *= "[^"]+"$', but what you see below is what works for make. 🤷
+# FIXME: the correct egrep expression is '^name *= "[^"]+"$', but what you see below is what works for make. 🤷
 PACKAGE = $(shell egrep '^name *= "[^"]+"' Cargo.toml | sed 's/^name *= "\([^"]\+\)"/\1/')
 
-BENCH   = cargo bench --workspace
-BUILD   = cargo build
-FORMAT  = cargo fmt --all
-LINT    = cargo clippy --workspace --all-features --release -- --deny warnings --forbid clippy::pedantic --forbid clippy::cargo
-TEST    = cargo test --workspace
-
 # TODO: add "doc" and "publish" targets
-# TODO: make targets "format," "lint" and "test" not .PHONY, so we don't run them unless we have to (output a file after each)
-# TODO: create a "bench" target. Make it not .PHONY
 
 .PHONY: none
 none:
-	# Please specify a target: build clean format lint release run test
+	# Please specify a target: build check clean commit format run
 
-.PHONY: release
-release: build target/release/$(PACKAGE)
-target/release/$(PACKAGE): target/debug/$(PACKAGE)
-	$(BENCH)
-	$(BUILD) --release
-
+# Executes exploratory tests during development
+# Note: "cargo run" executes "cargo build" if needed, make does not need to worry about this.
 .PHONY: run
-run: build
+run: check
 	cargo run -- $(FILE_NAME)
 
-.PHONY: build
-build: target/debug/$(PACKAGE)
+# Lint and syntax checking
+.PHONY: check
+check: target/debug/$(PACKAGE)
 target/debug/$(PACKAGE): src/main.rs
-	make test
-	$(BUILD)
+	cargo clippy --workspace --all-features --release -- --deny warnings --forbid clippy::pedantic --forbid clippy::cargo
 
-.PHONY: test
-test:
-	$(LINT)
-	$(TEST)
+.PHONY: commit
+commit: format
+	git commit -S -m '$(MESSAGE)'
 
-.PHONY: lint
-lint:
-	$(LINT)
+.PHONY: format
+format:
+	cargo fmt --all
+
+# Executes automated tests and generates executable
+.PHONY: build
+build: build target/release/$(PACKAGE)
+target/release/$(PACKAGE): src/main.rs
+	make check
+	cargo test --workspace
+	cargo bench --workspace
+	cargo build --release
 
 .PHONY: clean
 clean:
 	cargo clean
 	rm -f Cargo.lock
-
-.PHONY: format
-format:
-	$(FORMAT)
-
-.PHONY: commit
-commit: format
-	git commit -S -m '$(MESSAGE)'
