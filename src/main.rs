@@ -6,7 +6,7 @@ use std::fs::File;
 use std::io::{
     BufReader, Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom,
 };
-use Type_::{
+use Type::{
     Ascii, Byte, Double, Float, Long, Rational, Sbyte, Short, Slong, Srational, Sshort, Undefined,
     Unexpected, Unknown,
 };
@@ -279,7 +279,7 @@ fn read<const BYTES2READ: usize>(r: &mut BufReader<File>) -> Result<[u8; BYTES2R
 
 struct IfdEntry {
     tag: u16,
-    type_: Type,
+    type_: Type_,
     count: u32,
     offset: u64,
 }
@@ -295,7 +295,7 @@ impl IfdEntry {
         }
     }
 
-    fn type_(&self) -> Type_ {
+    fn type_(&self) -> Type {
         self.type_.type_
     }
 }
@@ -323,79 +323,8 @@ impl IfdEntry {
  *          skip over fields containing an unexpected field type.
  */
 
-/*
- * FIXME is there a better way to do this?
- *
- * In order to replicate the behavior of Java enums, Rust needs a combination of enum (for match)
- * and struct (to acess property "bytes")
- */
-const TYPES: [Type; 14] = [
-    Type {
-        type_: Unknown,
-        size_in_bytes: 0,
-    },
-    Type {
-        type_: Byte,
-        size_in_bytes: 1,
-    },
-    Type {
-        type_: Ascii,
-        size_in_bytes: 1,
-    },
-    Type {
-        type_: Short,
-        size_in_bytes: 2,
-    },
-    Type {
-        type_: Long,
-        size_in_bytes: 4,
-    },
-    Type {
-        type_: Rational,
-        size_in_bytes: 8,
-    },
-    Type {
-        type_: Sbyte,
-        size_in_bytes: 1,
-    },
-    Type {
-        type_: Undefined,
-        size_in_bytes: 1,
-    },
-    Type {
-        type_: Sshort,
-        size_in_bytes: 2,
-    },
-    Type {
-        type_: Slong,
-        size_in_bytes: 4,
-    },
-    Type {
-        type_: Srational,
-        size_in_bytes: 8,
-    },
-    Type {
-        type_: Float,
-        size_in_bytes: 4,
-    },
-    Type {
-        type_: Double,
-        size_in_bytes: 8,
-    },
-    Type {
-        type_: Unexpected,
-        size_in_bytes: 1,
-    },
-];
-
-#[derive(Clone, Copy)]
-struct Type {
-    type_: Type_,
-    size_in_bytes: u32,
-}
-
 #[derive(Clone, Copy, Debug)]
-enum Type_ {
+enum Type {
     Unknown,
     Byte,
     Ascii,
@@ -410,4 +339,75 @@ enum Type_ {
     Float,
     Double,
     Unexpected,
+}
+
+/*
+ * In order to replicate the behavior of Java enums, Rust needs a combination of enum (for match)
+ * and struct (to acess property "bytes")
+ *
+ * FIXME is there a better way to do this?
+ */
+const TYPES: [Type_; 14] = [
+    Type_ {
+        type_: Unknown,
+        size_in_bytes: 0,
+    },
+    Type_ {
+        type_: Byte,
+        size_in_bytes: 1,
+    },
+    Type_ {
+        type_: Ascii,
+        size_in_bytes: 1,
+    },
+    Type_ {
+        type_: Short,
+        size_in_bytes: 2,
+    },
+    Type_ {
+        type_: Long,
+        size_in_bytes: 4,
+    },
+    Type_ {
+        type_: Rational,
+        size_in_bytes: 8,
+    },
+    Type_ {
+        type_: Sbyte,
+        size_in_bytes: 1,
+    },
+    Type_ {
+        type_: Undefined,
+        size_in_bytes: 1,
+    },
+    Type_ {
+        type_: Sshort,
+        size_in_bytes: 2,
+    },
+    Type_ {
+        type_: Slong,
+        size_in_bytes: 4,
+    },
+    Type_ {
+        type_: Srational,
+        size_in_bytes: 8,
+    },
+    Type_ {
+        type_: Float,
+        size_in_bytes: 4,
+    },
+    Type_ {
+        type_: Double,
+        size_in_bytes: 8,
+    },
+    Type_ {
+        type_: Unexpected,
+        size_in_bytes: 1,
+    },
+];
+
+#[derive(Clone, Copy)]
+struct Type_ {
+    type_: Type,
+    size_in_bytes: u32,
 }
