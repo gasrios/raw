@@ -1,6 +1,4 @@
-use endianness::{
-    read_i16, read_u16, read_u32, ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian,
-};
+use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::env::args;
 use std::fs::File;
 use std::io::{
@@ -13,19 +11,26 @@ use Type::{
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
-        let mut buffered_reader: BufReader<File> = BufReader::new(File::open(file_name)?);
+        let mut reader: BufReader<File> = BufReader::new(File::open(file_name)?);
 
         // It does not matter which value we initialize those with, we just need something so they
         // can be passed as parameters, below. process_header() will set the right values later.
         let mut byte_order: ByteOrder = BigEndian;
         let mut offset: u64 = 0;
 
-        process_header(&mut buffered_reader, &mut byte_order, &mut offset)?;
+        process_header(&mut reader, &mut byte_order, &mut offset)?;
 
         loop {
+            if offset % 2 == 1 {
+                return Err(Error::new(
+                    InvalidData,
+                    format!("Value offset is odd and therefore not a word boundary: {offset}"),
+                ));
+            }
+
             println!("IFD offset: {offset}");
 
-            process_ifd(&mut buffered_reader, byte_order, &mut offset)?;
+            process_ifd(&mut reader, byte_order, &mut offset)?;
 
             /*
              * From TIFF 6.0 Specification, page 14
@@ -36,19 +41,6 @@ fn main() -> Result<(), Error> {
             if offset == 0 {
                 break;
             }
-
-            /*
-             * From TIFF 6.0 Specification, page 13
-             *
-             * The directory may be at any location in the file after the header but must begin on
-             * a word boundary.
-             */
-            if offset % 2 == 1 {
-                return Err(Error::new(
-                    InvalidData,
-                    format!("Value offset is odd and therefore not a word boundary: {offset}"),
-                ));
-            }
         }
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
@@ -58,7 +50,7 @@ fn main() -> Result<(), Error> {
 }
 
 fn process_header(
-    buffered_reader: &mut BufReader<File>,
+    reader: &mut BufReader<File>,
     byte_order: &mut ByteOrder,
     offset: &mut u64,
 ) -> Result<(), Error> {
@@ -79,7 +71,7 @@ fn process_header(
      *            from most significant to least significant, for both 16-bit and 32-bit
      *            integers. This is called big-endian byte order.
      */
-    let mut buffer: [u8; 2] = read(buffered_reader)?;
+    let buffer: [u8; 2] = read(reader)?;
     if buffer[0] == 0x49 && buffer[1] == 0x49 {
         *byte_order = LittleEndian;
     } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
@@ -100,9 +92,7 @@ fn process_header(
      *
      *            The byte order depends on the value of Bytes 0-1.
      */
-    buffer = read(buffered_reader)?;
-    // FIXME implement trait std::convert::From<T>
-    let version: i16 = read_i16(&buffer, *byte_order).unwrap();
+    let version: i16 = read_i16(reader, *byte_order)?;
     if version != 42 {
         return Err(Error::new(
             InvalidData,
@@ -120,9 +110,7 @@ fn process_header(
      *            location with respect to the beginning of the TIFF file. The first byte
      *            of the file has an offset of 0.
      */
-    let buffer: [u8; 4] = read(buffered_reader)?;
-    // FIXME implement trait std::convert::From<T>
-    *offset = u64::from(read_u32(&buffer, *byte_order).unwrap());
+    *offset = u64::from(read_u32(reader, *byte_order)?);
 
     if *offset < 8 {
         return Err(Error::new(
@@ -131,25 +119,15 @@ fn process_header(
         ));
     }
 
-    if *offset % 2 == 1 {
-        return Err(Error::new(
-            InvalidData,
-            format!(
-                "Value offset is odd and therefore not a word boundary: {}",
-                *offset
-            ),
-        ));
-    }
-
     Ok(())
 }
 
 fn process_ifd(
-    buffered_reader: &mut BufReader<File>,
+    reader: &mut BufReader<File>,
     byte_order: ByteOrder,
     offset: &mut u64,
 ) -> Result<(), Error> {
-    buffered_reader.seek(SeekFrom::Start(*offset))?;
+    reader.seek(SeekFrom::Start(*offset))?;
 
     /*
      * From TIFF 6.0 Specification, page 14
@@ -163,9 +141,7 @@ fn process_ifd(
      *
      * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
      */
-    let mut buffer: [u8; 2] = read(buffered_reader)?;
-    // FIXME implement trait std::convert::From<T>
-    let number_of_fields: u16 = read_u16(&buffer, byte_order).unwrap();
+    let number_of_fields: u16 = read_u16(reader, byte_order)?;
 
     println!("Number of fields: {number_of_fields}");
 
@@ -184,17 +160,13 @@ fn process_ifd(
          *
          * Bytes 0-1 The Tag that identifies the field.
          */
-        buffer = read(buffered_reader)?;
         // TODO process numeric value of tag
-        // FIXME implement trait std::convert::From<T>
-        entry.tag = read_u16(&buffer, byte_order).unwrap();
+        entry.tag = read_u16(reader, byte_order)?;
 
         /*
          * Bytes 2-3 The field Type.
          */
-        buffer = read(buffered_reader)?;
-        // FIXME implement trait std::convert::From<T>
-        let type_: usize = usize::from(read_u16(&buffer, byte_order).unwrap());
+        let type_: usize = usize::from(read_u16(reader, byte_order)?);
 
         if (1..13).contains(&type_) {
             entry.type_ = TYPES[type_];
@@ -206,9 +178,7 @@ fn process_ifd(
         /*
          * Bytes 4-7 The number of values, Count of the indicated Type.
          */
-        let mut buffer: [u8; 4] = read(buffered_reader)?;
-        // FIXME implement trait std::convert::From<T>
-        entry.count = read_u32(&buffer, byte_order).unwrap();
+        entry.count = read_u32(reader, byte_order)?;
 
         /*
          * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
@@ -216,10 +186,7 @@ fn process_ifd(
          *            Value Offset will thus be an even number. This file offset may point
          *            anywhere in the file, even after the image data.
          */
-        buffer = read(buffered_reader)?;
-        // FIXME implement trait std::convert::From<T>
-        // FIXME Test offset is even
-        entry.offset = u64::from(read_u32(&buffer, byte_order).unwrap());
+        entry.offset = u64::from(read_u32(reader, byte_order)?);
 
         println!("Tag: {}", entry.tag);
         println!("\tType: {:?}", entry.type_());
@@ -254,20 +221,48 @@ fn process_ifd(
                 _ => println!("\tType: Other"),
             }
         } else {
+            if entry.offset % 2 == 1 {
+                return Err(Error::new(
+                    InvalidData,
+                    format!(
+                        "Value offset is odd and therefore not a word boundary: {}",
+                        entry.offset
+                    ),
+                ));
+            }
             println!("\tValue offset: {}", entry.offset);
         }
     }
 
-    let buffer: [u8; 4] = read(buffered_reader)?;
-    // FIXME implement trait std::convert::From<T>
-    *offset = u64::from(read_u32(&buffer, byte_order).unwrap());
+    /*
+     * From TIFF 6.0 Specification, page 13
+     *
+     * The directory may be at any location in the file after the header but must begin on
+     * a word boundary.
+     */
+    *offset = u64::from(read_u32(reader, byte_order)?);
 
     Ok(())
 }
 
-fn read<const BYTES2READ: usize>(r: &mut BufReader<File>) -> Result<[u8; BYTES2READ], Error> {
+fn read_i16(reader: &mut BufReader<File>, byte_order: ByteOrder) -> Result<i16, Error> {
+    let buffer: [u8; 2] = read(reader)?;
+    Ok(endianness::read_i16(&buffer, byte_order).unwrap())
+}
+
+fn read_u16(reader: &mut BufReader<File>, byte_order: ByteOrder) -> Result<u16, Error> {
+    let buffer: [u8; 2] = read(reader)?;
+    Ok(endianness::read_u16(&buffer, byte_order).unwrap())
+}
+
+fn read_u32(reader: &mut BufReader<File>, byte_order: ByteOrder) -> Result<u32, Error> {
+    let buffer: [u8; 4] = read(reader)?;
+    Ok(endianness::read_u32(&buffer, byte_order).unwrap())
+}
+
+fn read<const BYTES2READ: usize>(reader: &mut BufReader<File>) -> Result<[u8; BYTES2READ], Error> {
     let mut buffer: [u8; BYTES2READ] = [0u8; BYTES2READ];
-    let bytes_read: usize = r.read(&mut buffer)?;
+    let bytes_read: usize = reader.read(&mut buffer)?;
     if bytes_read != BYTES2READ {
         return Err(Error::new(
             UnexpectedEof,
@@ -343,7 +338,7 @@ enum Type {
 
 /*
  * In order to replicate the behavior of Java enums, Rust needs a combination of enum (for match)
- * and struct (to acess property "bytes")
+ * and struct (to acess property "size_in_bytes")
  *
  * FIXME is there a better way to do this?
  */
