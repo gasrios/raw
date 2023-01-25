@@ -13,11 +13,11 @@ none:
 run: check
 	cargo run -- $(FILE_NAME)
 
-# Lint and syntax checking
+# Lint and syntax checking. See https://doc.rust-lang.org/stable/clippy/index.html
 .PHONY: check
 check: target/debug/$(PACKAGE)
 target/debug/$(PACKAGE): src/main.rs
-	cargo clippy --workspace --all-features --release -- --deny warnings --forbid clippy::pedantic --forbid clippy::cargo
+	cargo clippy --workspace --all-features --release -- --forbid clippy::all --forbid clippy::pedantic --forbid clippy::cargo
 
 .PHONY: commit
 commit: format
