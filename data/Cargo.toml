@@ -1,5 +1,5 @@
 [package]
-name         = "raw"
+name         = "data"
 version      = "0.0.0"
 edition      = "2021"
 description  = "Camera raw image format reader"
@@ -12,6 +12,3 @@ categories   = ["multimedia::images"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-endianness  = "0.2"
-tiff_reader = { path = "../tiff_reader" }
-data        = { path = "../data" }

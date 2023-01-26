@@ -1,12 +1,8 @@
+use data::{Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData, Seek, SeekFrom};
-use tiff_reader::{read, read_i16, read_u16, read_u32};
-use Type::{
-    Ascii, Byte, Double, Float, Long, Rational, Sbyte, Short, Slong, Srational, Sshort, Undefined,
-    Unexpected, Unknown,
-};
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
@@ -68,7 +64,7 @@ fn process_header(
      *            from most significant to least significant, for both 16-bit and 32-bit
      *            integers. This is called big-endian byte order.
      */
-    let buffer: [u8; 2] = read(reader)?;
+    let buffer: [u8; 2] = tiff_reader::read(reader)?;
     if buffer[0] == 0x49 && buffer[1] == 0x49 {
         *byte_order = LittleEndian;
     } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
@@ -89,7 +85,7 @@ fn process_header(
      *
      *            The byte order depends on the value of Bytes 0-1.
      */
-    let version: i16 = read_i16(reader, *byte_order)?;
+    let version: i16 = tiff_reader::read_i16(reader, *byte_order)?;
     if version != 42 {
         return Err(Error::new(
             InvalidData,
@@ -107,7 +103,7 @@ fn process_header(
      *            location with respect to the beginning of the TIFF file. The first byte
      *            of the file has an offset of 0.
      */
-    *offset = u64::from(read_u32(reader, *byte_order)?);
+    *offset = u64::from(tiff_reader::read_u32(reader, *byte_order)?);
 
     /*
      * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and each
@@ -145,7 +141,7 @@ fn process_ifd(
      *
      * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
      */
-    let number_of_fields: u16 = read_u16(reader, byte_order)?;
+    let number_of_fields: u16 = tiff_reader::read_u16(reader, byte_order)?;
 
     for _i in 0..number_of_fields {
         let mut entry: IfdEntry = IfdEntry::new();
@@ -162,25 +158,18 @@ fn process_ifd(
          *
          * Bytes 0-1 The Tag that identifies the field.
          */
-        // TODO process numeric value of tag
-        entry.tag = read_u16(reader, byte_order)?;
+        let tag: u16 = tiff_reader::read_u16(reader, byte_order)?;
+        entry.tag = data::tag(tag);
 
         /*
          * Bytes 2-3 The field Type.
          */
-        let type_: usize = usize::from(read_u16(reader, byte_order)?);
-
-        if (1..13).contains(&type_) {
-            entry.type_ = TYPES[type_];
-        } else {
-            // See below. TYPES[13] == Unexpected
-            entry.type_ = TYPES[13];
-        }
+        entry.type_ = data::type_(tiff_reader::read_u16(reader, byte_order)?);
 
         /*
          * Bytes 4-7 The number of values, Count of the indicated Type.
          */
-        entry.count = read_u32(reader, byte_order)?;
+        entry.count = tiff_reader::read_u32(reader, byte_order)?;
 
         /*
          * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
@@ -188,10 +177,10 @@ fn process_ifd(
          *            Value Offset will thus be an even number. This file offset may point
          *            anywhere in the file, even after the image data.
          */
-        entry.offset = u64::from(read_u32(reader, byte_order)?);
+        entry.offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
 
-        println!("Tag: {}", entry.tag);
-        println!("\tType: {:?}", entry.type_());
+        println!("Tag: {:?}", entry.tag);
+        println!("\tType: {:?}", entry.type_);
         println!("\tNumber of values: {}", entry.count);
 
         /*
@@ -205,21 +194,21 @@ fn process_ifd(
          * bytes. Whether the Value fits within 4 bytes is determined by the Type and Count of the
          * field.
          */
-        if entry.type_.size_in_bytes * entry.count < 5 {
+        if data::type_size(entry.type_) * entry.count < 5 {
             // TODO read those values
-            match entry.type_() {
-                Byte => println!("\tType: Byte"),
-                Ascii => println!("\tType: Ascii"),
-                Short => println!("\tType: Short"),
-                Long => println!("\tType: Long"),
-                Rational => println!("\tType: Rational"),
-                Sbyte => println!("\tType: Sbyte"),
-                Undefined => println!("\tType: Undefined"),
-                Sshort => println!("\tType: Sshort"),
-                Slong => println!("\tType: Slong"),
-                Srational => println!("\tType: Srational"),
-                Float => println!("\tType: Float"),
-                Double => println!("\tType: Double"),
+            match entry.type_ {
+                Type::Byte => println!("\tType: Byte"),
+                Type::Ascii => println!("\tType: Ascii"),
+                Type::Short => println!("\tType: Short"),
+                Type::Long => println!("\tType: Long"),
+                Type::Rational => println!("\tType: Rational"),
+                Type::Sbyte => println!("\tType: Sbyte"),
+                Type::Undefined => println!("\tType: Undefined"),
+                Type::Sshort => println!("\tType: Sshort"),
+                Type::Slong => println!("\tType: Slong"),
+                Type::Srational => println!("\tType: Srational"),
+                Type::Float => println!("\tType: Float"),
+                Type::Double => println!("\tType: Double"),
                 _ => println!("\tType: Other"),
             }
         } else {
@@ -242,14 +231,14 @@ fn process_ifd(
      * The directory may be at any location in the file after the header but must begin on
      * a word boundary.
      */
-    *offset = u64::from(read_u32(reader, byte_order)?);
+    *offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
 
     Ok(())
 }
 
 struct IfdEntry {
-    tag: u16,
-    type_: Type_,
+    tag: Tag,
+    type_: Type,
     count: u32,
     offset: u64,
 }
@@ -257,127 +246,10 @@ struct IfdEntry {
 impl IfdEntry {
     fn new() -> IfdEntry {
         IfdEntry {
-            tag: 0,
-            // See below. TYPES[0] == Unknown
-            type_: TYPES[0],
+            tag: Tag::Unknown,
+            type_: Type::Unknown,
             count: 0,
             offset: 0,
         }
     }
-
-    fn type_(&self) -> Type {
-        self.type_.type_
-    }
-}
-
-/*
- * From TIFF 6.0 Specification, page 14
- *
- * Types
- *
- * The field types and their sizes are:
- *  1 = BYTE 8-bit unsigned integer.
- *  2 = ASCII 8-bit byte that contains a 7-bit ASCII code; the last byte must be NUL (binary zero).
- *  3 = SHORT 16-bit (2-byte) unsigned integer.
- *  4 = LONG 32-bit (4-byte) unsigned integer.
- *  5 = RATIONAL Two LONGs: the first represents the numerator of a fraction; the second, the denominator.
- *  6 = SBYTE An 8-bit signed (twos-complement) integer.
- *  7 = UNDEFINED An 8-bit byte that may contain anything, depending on the definition of the field.
- *  8 = SSHORT A 16-bit (2-byte) signed (twos-complement) integer.
- *  9 = SLONG A 32-bit (4-byte) signed (twos-complement) integer.
- * 10 = SRATIONAL Two SLONG’s: the first represents the numerator of a fraction, the second the denominator.
- * 11 = FLOAT Single precision (4-byte) IEEE format.
- * 12 = DOUBLE Double precision (8-byte) IEEE format.
- *
- * Warning: It is possible that other TIFF field types will be added in the future. Readers should
- *          skip over fields containing an unexpected field type.
- */
-
-#[derive(Clone, Copy, Debug)]
-enum Type {
-    Unknown,
-    Byte,
-    Ascii,
-    Short,
-    Long,
-    Rational,
-    Sbyte,
-    Undefined,
-    Sshort,
-    Slong,
-    Srational,
-    Float,
-    Double,
-    Unexpected,
-}
-
-/*
- * In order to replicate the behavior of Java enums, Rust needs a combination of enum (for match)
- * and struct (to acess property "size_in_bytes")
- *
- * FIXME is there a better way to do this?
- */
-const TYPES: [Type_; 14] = [
-    Type_ {
-        type_: Unknown,
-        size_in_bytes: 0,
-    },
-    Type_ {
-        type_: Byte,
-        size_in_bytes: 1,
-    },
-    Type_ {
-        type_: Ascii,
-        size_in_bytes: 1,
-    },
-    Type_ {
-        type_: Short,
-        size_in_bytes: 2,
-    },
-    Type_ {
-        type_: Long,
-        size_in_bytes: 4,
-    },
-    Type_ {
-        type_: Rational,
-        size_in_bytes: 8,
-    },
-    Type_ {
-        type_: Sbyte,
-        size_in_bytes: 1,
-    },
-    Type_ {
-        type_: Undefined,
-        size_in_bytes: 1,
-    },
-    Type_ {
-        type_: Sshort,
-        size_in_bytes: 2,
-    },
-    Type_ {
-        type_: Slong,
-        size_in_bytes: 4,
-    },
-    Type_ {
-        type_: Srational,
-        size_in_bytes: 8,
-    },
-    Type_ {
-        type_: Float,
-        size_in_bytes: 4,
-    },
-    Type_ {
-        type_: Double,
-        size_in_bytes: 8,
-    },
-    Type_ {
-        type_: Unexpected,
-        size_in_bytes: 1,
-    },
-];
-
-#[derive(Clone, Copy)]
-struct Type_ {
-    type_: Type,
-    size_in_bytes: u32,
 }

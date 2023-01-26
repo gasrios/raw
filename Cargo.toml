@@ -3,4 +3,5 @@
 members = [
     "raw",
     "tiff_reader",
+    "data",
 ]
