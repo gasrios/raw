@@ -28,8 +28,6 @@ fn main() -> Result<(), Error> {
                 ));
             }
 
-            println!("IFD offset: {offset}");
-
             process_ifd(&mut reader, byte_order, &mut offset)?;
 
             /*
@@ -112,6 +110,13 @@ fn process_header(
      */
     *offset = u64::from(read_u32(reader, *byte_order)?);
 
+    /*
+     * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and each
+     * IFD must have at least one entry."
+     *
+     * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the file.
+     *
+     */
     if *offset < 8 {
         return Err(Error::new(
             InvalidData,
@@ -142,8 +147,6 @@ fn process_ifd(
      * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
      */
     let number_of_fields: u16 = read_u16(reader, byte_order)?;
-
-    println!("Number of fields: {number_of_fields}");
 
     for _i in 0..number_of_fields {
         let mut entry: IfdEntry = IfdEntry::new();
