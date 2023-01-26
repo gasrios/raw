@@ -13,4 +13,12 @@ name = "raw"
 version = "0.0.0"
 dependencies = [
  "endianness",
+ "tiff_reader",
+]
+
+[[package]]
+name = "tiff_reader"
+version = "0.0.0"
+dependencies = [
+ "endianness",
 ]

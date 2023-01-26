@@ -1,0 +1,15 @@
+[package]
+name         = "tiff_reader"
+version      = "0.0.0"
+edition      = "2021"
+description  = "Camera raw image format reader"
+license-file = "LICENSE"
+repository   = "TODO"
+readme       = "README.md"
+keywords     = ["camera raw", "image format", "reader"]
+categories   = ["multimedia::images"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+endianness = "0.2"
