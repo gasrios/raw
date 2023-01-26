@@ -14,7 +14,7 @@ run: check
 # TODO I want to run cargo clippy for each crate separately, and only as needed.
 .PHONY: check
 check:
-	cargo clippy --workspace --all-features --release -- --forbid clippy::all --forbid clippy::pedantic --forbid clippy::cargo
+	cargo clippy --workspace --all-features --release -- --deny warnings --forbid clippy::all --forbid clippy::pedantic --forbid clippy::cargo
 
 # Format code before committing, so we never get diff issues over formatting alone.
 # Also, signs all commits.
@@ -29,8 +29,7 @@ format:
 # Executes automated tests and, if they pass, generates executable.
 # TODO I want to run tests for each crate separately, and only as needed.
 .PHONY: build
-build:
-	make check
+build: check
 	cargo test --workspace
 	cargo bench --workspace
 	cargo build --release
