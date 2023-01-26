@@ -1,6 +1,3 @@
-# FIXME: the correct egrep expression is '^name *= "[^"]+"$', but what you see below is what works for make. 🤷
-PACKAGE = $(shell egrep '^name *= "[^"]+"' Cargo.toml | sed 's/^name *= "\([^"]\+\)"/\1/')
-
 # TODO: add "doc" and "publish" targets.
 
 .PHONY: none
@@ -14,9 +11,9 @@ run: check
 	cargo run -- $(FILE_NAME)
 
 # Lint and syntax checking (see https://doc.rust-lang.org/stable/clippy/index.html).
+# TODO I want to run cargo clippy for each crate separately, and only as needed.
 .PHONY: check
-check: target/debug/$(PACKAGE)
-target/debug/$(PACKAGE): src/main.rs
+check:
 	cargo clippy --workspace --all-features --release -- --forbid clippy::all --forbid clippy::pedantic --forbid clippy::cargo
 
 # Format code before committing, so we never get diff issues over formatting alone.
@@ -30,9 +27,9 @@ format:
 	cargo fmt --all
 
 # Executes automated tests and, if they pass, generates executable.
+# TODO I want to run tests for each crate separately, and only as needed.
 .PHONY: build
-build: build target/release/$(PACKAGE)
-target/release/$(PACKAGE): src/main.rs
+build:
 	make check
 	cargo test --workspace
 	cargo bench --workspace
