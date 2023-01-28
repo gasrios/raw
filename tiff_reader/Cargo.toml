@@ -5,7 +5,7 @@ edition     = "2021"
 description = "Camera raw image format reader, logic to read TIFF files"
 license     = "GPL-3.0-only"
 repository  = "https://github.com/gasrios/raw/"
-readme      = "README.md"
+readme      = "https://github.com/gasrios/raw/blob/main/README.md"
 keywords    = ["camera raw", "image format", "reader"]
 categories  = ["multimedia::images"]
 
