@@ -1,6 +1,6 @@
 # raw
 
-This is **not** a production ready raw reader, just a personal project I started while studying digital image processing. The first version was written in Java, then migrated to [Rust](https://www.rust-lang.org/) because, you guessed it, I am now studying Rust.
+This is **not** a production ready raw reader, just a personal project I started while studying digital image processing. The [first version](https://github.com/raw-tiff) was written in Java, then migrated to [Rust](https://www.rust-lang.org/) because, you guessed it, I am now studying Rust.
 
 If you need a complete, fully functional library, check [dcraw](https://www.cybercom.net/~dcoffin/dcraw/) out.
 
