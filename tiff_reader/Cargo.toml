@@ -13,3 +13,4 @@ categories  = ["multimedia::images"]
 
 [dependencies]
 endianness = "0.2"
+data       = { path = "../data" }

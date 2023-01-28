@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-use data::{IfdEntry, Tag, Type};
+use data::{IfdEntry, Offset, Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::env::args;
 use std::fs::File;
@@ -23,7 +23,7 @@ fn main() -> Result<(), Error> {
         // It does not matter which value we initialize those with, we just need something so they
         // can be passed as parameters, below. process_header() will set the right values later.
         let mut byte_order: ByteOrder = BigEndian;
-        let mut offset: u64 = 0;
+        let mut offset: Offset = 0;
 
         process_header(&mut reader, &mut byte_order, &mut offset)?;
 
@@ -50,7 +50,7 @@ fn main() -> Result<(), Error> {
 fn process_header(
     reader: &mut BufReader<File>,
     byte_order: &mut ByteOrder,
-    offset: &mut u64,
+    offset: &mut Offset,
 ) -> Result<(), Error> {
     /*
      * From TIFF 6.0 Specification, page 13
@@ -130,7 +130,7 @@ fn process_header(
 fn process_ifd(
     reader: &mut BufReader<File>,
     byte_order: ByteOrder,
-    offset: &mut u64,
+    offset: &mut Offset,
 ) -> Result<(), Error> {
     reader.seek(SeekFrom::Start(*offset))?;
     /*
@@ -169,13 +169,33 @@ fn process_ifd(
         entry.type_ = Type::new(tiff_reader::read_u16(reader, byte_order)?);
 
         /*
+         * From TIFF 6.0 Specification, page 14
+         *
+         * Warning: It is possible that other TIFF field types will be added in the future. Readers should
+         *          skip over fields containing an unexpected field type.
+         */
+        if entry.type_ == Type::Unexpected(0) {
+            break;
+        }
+
+        if entry.type_ == Type::Unknown(0) {
+            return Err(Error::new(
+                InvalidData,
+                format!("Invalid IFD Entry type: {:?}", entry.type_),
+            ));
+        }
+
+        /*
          * Bytes 4-7 The number of values, Count of the indicated Type.
          */
         entry.count = tiff_reader::read_u32(reader, byte_order)?;
 
-        println!("Tag: {:?}", entry.tag);
-        println!("\tType: {:?}", entry.type_);
-        println!("\tNumber of values: {}", entry.count);
+        if entry.count < 1 {
+            return Err(Error::new(
+                InvalidData,
+                format!("IFD Entry should have at least one value: {}", entry.count),
+            ));
+        }
 
         /*
          * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
@@ -184,6 +204,10 @@ fn process_ifd(
          *       std::io::BufReader expects.
          */
         entry.offset = tiff_reader::read_offset(reader, byte_order)?;
+
+        println!("Tag: {:?}", entry.tag);
+        println!("\tType: {:?}", entry.type_);
+        println!("\tNumber of values: {}", entry.count);
 
         /*
          * The Value is expected to begin on a word boundary; the corresponding Value Offset will

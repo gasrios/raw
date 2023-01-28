@@ -10,6 +10,8 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
+pub type Offset = u64;
+
 pub struct IfdEntry {
     pub tag: Tag,
     pub type_: Type,
@@ -247,6 +249,24 @@ impl Tag {
     }
 }
 
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum Type {
+    Unknown(u32),
+    Byte(u32),
+    Ascii(u32),
+    Short(u32),
+    Long(u32),
+    Rational(u32),
+    Sbyte(u32),
+    Undefined(u32),
+    Sshort(u32),
+    Slong(u32),
+    Srational(u32),
+    Float(u32),
+    Double(u32),
+    Unexpected(u32),
+}
+
 /*
  * From TIFF 6.0 Specification, page 14
  *
@@ -269,24 +289,6 @@ impl Tag {
  * Warning: It is possible that other TIFF field types will be added in the future. Readers should
  *          skip over fields containing an unexpected field type.
  */
-#[derive(Clone, Copy, Debug)]
-pub enum Type {
-    Unknown(u32),
-    Byte(u32),
-    Ascii(u32),
-    Short(u32),
-    Long(u32),
-    Rational(u32),
-    Sbyte(u32),
-    Undefined(u32),
-    Sshort(u32),
-    Slong(u32),
-    Srational(u32),
-    Float(u32),
-    Double(u32),
-    Unexpected(u32),
-}
-
 impl Type {
     #[must_use]
     pub const fn new(type_: u16) -> Type {

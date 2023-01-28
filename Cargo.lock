@@ -25,5 +25,6 @@ dependencies = [
 name = "tiff_reader"
 version = "0.0.0"
 dependencies = [
+ "data",
  "endianness",
 ]
