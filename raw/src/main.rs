@@ -10,7 +10,7 @@
  * You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
  */
 
-use data::{Tag, Type};
+use data::{IfdEntry, Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::env::args;
 use std::fs::File;
@@ -28,13 +28,6 @@ fn main() -> Result<(), Error> {
         process_header(&mut reader, &mut byte_order, &mut offset)?;
 
         loop {
-            if offset % 2 == 1 {
-                return Err(Error::new(
-                    InvalidData,
-                    format!("Value offset is odd and therefore not a word boundary: {offset}"),
-                ));
-            }
-
             process_ifd(&mut reader, byte_order, &mut offset)?;
 
             /*
@@ -115,7 +108,7 @@ fn process_header(
      *            location with respect to the beginning of the TIFF file. The first byte
      *            of the file has an offset of 0.
      */
-    *offset = u64::from(tiff_reader::read_u32(reader, *byte_order)?);
+    *offset = tiff_reader::read_offset(reader, *byte_order)?;
 
     /*
      * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and each
@@ -140,6 +133,10 @@ fn process_ifd(
     offset: &mut u64,
 ) -> Result<(), Error> {
     reader.seek(SeekFrom::Start(*offset))?;
+    /*
+     * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
+     * meaning, this is sometimes confusing.
+     */
 
     /*
      * From TIFF 6.0 Specification, page 14
@@ -156,13 +153,6 @@ fn process_ifd(
     let number_of_fields: u16 = tiff_reader::read_u16(reader, byte_order)?;
 
     for _i in 0..number_of_fields {
-        let mut entry: IfdEntry = IfdEntry::new();
-
-        /*
-         * TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same meaning, this
-         * is sometimes confusing.
-         */
-
         /*
          * IFD Entry
          *
@@ -170,32 +160,36 @@ fn process_ifd(
          *
          * Bytes 0-1 The Tag that identifies the field.
          */
-        let tag: u16 = tiff_reader::read_u16(reader, byte_order)?;
-        entry.tag = data::tag(tag);
+        let mut entry: IfdEntry =
+            IfdEntry::new(Tag::new(tiff_reader::read_u16(reader, byte_order)?));
 
         /*
          * Bytes 2-3 The field Type.
          */
-        entry.type_ = data::type_(tiff_reader::read_u16(reader, byte_order)?);
+        entry.type_ = Type::new(tiff_reader::read_u16(reader, byte_order)?);
 
         /*
          * Bytes 4-7 The number of values, Count of the indicated Type.
          */
         entry.count = tiff_reader::read_u32(reader, byte_order)?;
 
-        /*
-         * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
-         *            The Value is expected to begin on a word boundary; the corresponding
-         *            Value Offset will thus be an even number. This file offset may point
-         *            anywhere in the file, even after the image data.
-         */
-        entry.offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
-
         println!("Tag: {:?}", entry.tag);
         println!("\tType: {:?}", entry.type_);
         println!("\tNumber of values: {}", entry.count);
 
         /*
+         * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
+         *
+         * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the type
+         *       std::io::BufReader expects.
+         */
+        entry.offset = tiff_reader::read_offset(reader, byte_order)?;
+
+        /*
+         * The Value is expected to begin on a word boundary; the corresponding Value Offset will
+         * thus be an even number. This file offset may point anywhere in the file, even after the
+         * image data.
+         *
          * From TIFF 6.0 Specification, page 15
          *
          * Value/Offset
@@ -206,21 +200,21 @@ fn process_ifd(
          * bytes. Whether the Value fits within 4 bytes is determined by the Type and Count of the
          * field.
          */
-        if data::type_size(entry.type_) * entry.count < 5 {
+        if entry.size_in_bytes() < 5 {
             // TODO read those values
             match entry.type_ {
-                Type::Byte => println!("\tType: Byte"),
-                Type::Ascii => println!("\tType: Ascii"),
-                Type::Short => println!("\tType: Short"),
-                Type::Long => println!("\tType: Long"),
-                Type::Rational => println!("\tType: Rational"),
-                Type::Sbyte => println!("\tType: Sbyte"),
-                Type::Undefined => println!("\tType: Undefined"),
-                Type::Sshort => println!("\tType: Sshort"),
-                Type::Slong => println!("\tType: Slong"),
-                Type::Srational => println!("\tType: Srational"),
-                Type::Float => println!("\tType: Float"),
-                Type::Double => println!("\tType: Double"),
+                Type::Byte(_type_size) => println!("\tType: Byte"),
+                Type::Ascii(_type_size) => println!("\tType: Ascii"),
+                Type::Short(_type_size) => println!("\tType: Short"),
+                Type::Long(_type_size) => println!("\tType: Long"),
+                Type::Rational(_type_size) => println!("\tType: Rational"),
+                Type::Sbyte(_type_size) => println!("\tType: Sbyte"),
+                Type::Undefined(_type_size) => println!("\tType: Undefined"),
+                Type::Sshort(_type_size) => println!("\tType: Sshort"),
+                Type::Slong(_type_size) => println!("\tType: Slong"),
+                Type::Srational(_type_size) => println!("\tType: Srational"),
+                Type::Float(_type_size) => println!("\tType: Float"),
+                Type::Double(_type_size) => println!("\tType: Double"),
                 _ => println!("\tType: Other"),
             }
         } else {
@@ -237,31 +231,19 @@ fn process_ifd(
         }
     }
 
+    *offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
     /*
      * From TIFF 6.0 Specification, page 13
      *
      * The directory may be at any location in the file after the header but must begin on
      * a word boundary.
      */
-    *offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
+    if *offset % 2 == 1 {
+        return Err(Error::new(
+            InvalidData,
+            format!("Value offset is odd and therefore not a word boundary: {offset}"),
+        ));
+    }
 
     Ok(())
-}
-
-struct IfdEntry {
-    tag: Tag,
-    type_: Type,
-    count: u32,
-    offset: u64,
-}
-
-impl IfdEntry {
-    fn new() -> IfdEntry {
-        IfdEntry {
-            tag: Tag::Unknown,
-            type_: Type::Unknown,
-            count: 0,
-            offset: 0,
-        }
-    }
 }
