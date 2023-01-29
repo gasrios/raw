@@ -27,9 +27,9 @@ impl TiffReader {
     /// # Errors
     ///
     /// TODO add docs
-    pub fn new(file_name: String) -> Result<TiffReader, Error> {
+    pub fn new(reader: BufReader<File>) -> Result<TiffReader, Error> {
         Ok(TiffReader {
-            reader: BufReader::new(File::open(file_name)?),
+            reader,
             /*
              * It does not matter which value we initialize byte_order with, process_header() will
              * set the right value later.
