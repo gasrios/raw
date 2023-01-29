@@ -12,10 +12,10 @@
 
 use data::Offset;
 use std::env::args;
-use std::io::{Error, ErrorKind::InvalidData};
-use tiff_reader::TiffReader;
 use std::fs::File;
 use std::io::BufReader;
+use std::io::{Error, ErrorKind::InvalidData};
+use tiff_reader::TiffReader;
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
