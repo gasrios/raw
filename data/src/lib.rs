@@ -21,7 +21,7 @@ pub struct IfdEntry {
 
 impl IfdEntry {
     #[must_use]
-    pub fn new(tag: Tag) -> IfdEntry {
+    pub const fn new(tag: Tag) -> IfdEntry {
         IfdEntry {
             tag,
             type_: Type::Unknown(0),
@@ -31,7 +31,7 @@ impl IfdEntry {
     }
 
     #[must_use]
-    pub fn size_in_bytes(&self) -> u32 {
+    pub const fn size_in_bytes(&self) -> u32 {
         self.type_.size_in_bytes() * self.count
     }
 }

@@ -17,7 +17,6 @@ name = "raw"
 version = "0.0.0"
 dependencies = [
  "data",
- "endianness",
  "tiff_reader",
 ]
 
