@@ -20,15 +20,13 @@ fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
         let mut reader: BufReader<File> = BufReader::new(File::open(file_name)?);
 
-        // It does not matter which value we initialize those with, we just need something so they
-        // can be passed as parameters, below. process_header() will set the right values later.
+        // It does not matter which value we initialize byte_order with, we just need something so
+        // it can be passed as parameter, below. process_header() will set the right value later.
         let mut byte_order: ByteOrder = BigEndian;
-        let mut offset: Offset = 0;
 
-        process_header(&mut reader, &mut byte_order, &mut offset)?;
-
+        let mut offset: Offset = process_header(&mut reader, &mut byte_order)?;
         loop {
-            process_ifd(&mut reader, byte_order, &mut offset)?;
+            offset = process_ifd(&mut reader, byte_order, offset)?;
 
             /*
              * From TIFF 6.0 Specification, page 14
@@ -50,8 +48,7 @@ fn main() -> Result<(), Error> {
 fn process_header(
     reader: &mut BufReader<File>,
     byte_order: &mut ByteOrder,
-    offset: &mut Offset,
-) -> Result<(), Error> {
+) -> Result<Offset, Error> {
     /*
      * From TIFF 6.0 Specification, page 13
      *
@@ -108,7 +105,7 @@ fn process_header(
      *            location with respect to the beginning of the TIFF file. The first byte
      *            of the file has an offset of 0.
      */
-    *offset = tiff_reader::read_offset(reader, *byte_order)?;
+    let offset: Offset = tiff_reader::read_offset(reader, *byte_order)?;
 
     /*
      * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and each
@@ -117,22 +114,22 @@ fn process_header(
      * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the file.
      *
      */
-    if *offset < 8 {
+    if offset < 8 {
         return Err(Error::new(
             InvalidData,
-            format!("First IFD offset is smaller than header size: {}", *offset),
+            format!("First IFD offset is smaller than header size: {offset}"),
         ));
     }
 
-    Ok(())
+    Ok(offset)
 }
 
 fn process_ifd(
     reader: &mut BufReader<File>,
     byte_order: ByteOrder,
-    offset: &mut Offset,
-) -> Result<(), Error> {
-    reader.seek(SeekFrom::Start(*offset))?;
+    offset: Offset,
+) -> Result<Offset, Error> {
+    reader.seek(SeekFrom::Start(offset))?;
     /*
      * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
      * meaning, this is sometimes confusing.
@@ -255,19 +252,19 @@ fn process_ifd(
         }
     }
 
-    *offset = u64::from(tiff_reader::read_u32(reader, byte_order)?);
+    let offset: Offset = tiff_reader::read_offset(reader, byte_order)?;
     /*
      * From TIFF 6.0 Specification, page 13
      *
      * The directory may be at any location in the file after the header but must begin on
      * a word boundary.
      */
-    if *offset % 2 == 1 {
+    if offset % 2 == 1 {
         return Err(Error::new(
             InvalidData,
             format!("Value offset is odd and therefore not a word boundary: {offset}"),
         ));
     }
 
-    Ok(())
+    Ok(offset)
 }
