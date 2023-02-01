@@ -189,13 +189,12 @@ impl<R: Read + Seek> TiffReader<R> {
             let offset: Offset = self.read_offset()?;
 
             // TODO only create this after we process offset and get the actual data
-            let entry: IfdEntry =
-                IfdEntry {
-                    tag,
-                    type_,
-                    count,
-                    offset,
-                };
+            let entry: IfdEntry = IfdEntry {
+                tag,
+                type_,
+                count,
+                offset,
+            };
             println!("Tag: {:?}", entry.tag);
             println!("\tType: {:?}", entry.type_);
             println!("\tNumber of values: {}", entry.count);
