@@ -41,4 +41,4 @@ clean:
 
 .PHONY: todo
 todo:
-	egrep 'TODO|FIXME' $(shell find -type f -name '*.rs') | sed 's/^\([^:]\+:\) *\(.*\)/\1 \2/'
+	egrep -n 'TODO|FIXME' $(shell find -type f -name '*.rs') | sed 's/\(^[^:]\+:[0-9]\+:\) *\(.*\)/\1\t\2/'
