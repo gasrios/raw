@@ -12,21 +12,21 @@
 
 pub type Offset = u64;
 
-pub struct IfdEntry {
+pub struct IfdEntry<V> {
     pub tag: Tag,
     pub type_: Type,
     pub count: u32,
-    pub offset: u64,
+    pub value: V,
 }
 
-impl IfdEntry {
+impl<V> IfdEntry<V> {
     #[must_use]
-    pub const fn new(tag: Tag) -> IfdEntry {
+    pub const fn new(tag: Tag, type_: Type, count: u32, value: V) -> IfdEntry<V> {
         IfdEntry {
             tag,
-            type_: Type::Unknown(0),
-            count: 0,
-            offset: 0,
+            type_,
+            count,
+            value,
         }
     }
 

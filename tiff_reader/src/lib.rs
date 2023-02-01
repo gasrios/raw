@@ -14,7 +14,6 @@ use data::{IfdEntry, Offset, Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 
-// TODO use generics in the declaration of TiffReader
 pub struct TiffReader<R> {
     reader: R,
     byte_order: ByteOrder,
@@ -27,10 +26,8 @@ impl<R: Read + Seek> TiffReader<R> {
     pub fn new(reader: R) -> Result<TiffReader<R>, Error> {
         Ok(TiffReader {
             reader,
-            /*
-             * It does not matter which value we initialize byte_order with, process_header() will
-             * set the right value later.
-             */
+            // It does not matter which value we initialize byte_order with, process_header() will
+            // set the right value later.
             byte_order: BigEndian,
         })
     }
@@ -147,12 +144,12 @@ impl<R: Read + Seek> TiffReader<R> {
              *
              * Bytes 0-1 The Tag that identifies the field.
              */
-            let mut entry: IfdEntry = IfdEntry::new(Tag::new(self.read_u16()?));
+            let tag: Tag = self.read_tag()?;
 
             /*
              * Bytes 2-3 The field Type.
              */
-            entry.type_ = Type::new(self.read_u16()?);
+            let type_: Type = self.read_type()?;
 
             /*
              * From TIFF 6.0 Specification, page 14
@@ -160,26 +157,27 @@ impl<R: Read + Seek> TiffReader<R> {
              * Warning: It is possible that other TIFF field types will be added in the future. Readers should
              *          skip over fields containing an unexpected field type.
              */
-            if entry.type_ == Type::Unexpected(0) {
+            if type_ == Type::Unexpected(0) {
                 break;
             }
 
-            if entry.type_ == Type::Unknown(0) {
+            // TODO we don't need this anymore, self.read_type should have failed above
+            if type_ == Type::Unknown(0) {
                 return Err(Error::new(
                     InvalidData,
-                    format!("Invalid IFD Entry type: {:?}", entry.type_),
+                    format!("Invalid IFD Entry type: {type_:?}",),
                 ));
             }
 
             /*
              * Bytes 4-7 The number of values, Count of the indicated Type.
              */
-            entry.count = self.read_u32()?;
+            let count: u32 = self.read_u32()?;
 
-            if entry.count < 1 {
+            if count < 1 {
                 return Err(Error::new(
                     InvalidData,
-                    format!("IFD Entry should have at least one value: {}", entry.count),
+                    format!("IFD Entry should have at least one value: {count}"),
                 ));
             }
 
@@ -189,11 +187,14 @@ impl<R: Read + Seek> TiffReader<R> {
              * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the type
              *       std::io::BufReader expects.
              */
-            entry.offset = self.read_offset()?;
+            let offset: Offset = self.read_offset()?;
 
+            // TODO only create this after we process offset and get the actual data
+            let entry: IfdEntry<Offset> = IfdEntry::new(tag, type_, count, offset);
             println!("Tag: {:?}", entry.tag);
             println!("\tType: {:?}", entry.type_);
             println!("\tNumber of values: {}", entry.count);
+            println!("\tValue: {}", entry.value);
 
             /*
              * The Value is expected to begin on a word boundary; the corresponding Value Offset will
@@ -211,33 +212,32 @@ impl<R: Read + Seek> TiffReader<R> {
              * field.
              */
             if entry.size_in_bytes() < 5 {
-                // TODO read those values
                 match entry.type_ {
-                    Type::Byte(_type_size) => println!("\tType: Byte"),
-                    Type::Ascii(_type_size) => println!("\tType: Ascii"),
-                    Type::Short(_type_size) => println!("\tType: Short"),
-                    Type::Long(_type_size) => println!("\tType: Long"),
-                    Type::Rational(_type_size) => println!("\tType: Rational"),
-                    Type::Sbyte(_type_size) => println!("\tType: Sbyte"),
-                    Type::Undefined(_type_size) => println!("\tType: Undefined"),
-                    Type::Sshort(_type_size) => println!("\tType: Sshort"),
-                    Type::Slong(_type_size) => println!("\tType: Slong"),
-                    Type::Srational(_type_size) => println!("\tType: Srational"),
-                    Type::Float(_type_size) => println!("\tType: Float"),
-                    Type::Double(_type_size) => println!("\tType: Double"),
-                    _ => println!("\tType: Other"),
+                    Type::Byte(_type_size) => println!("\tTODO: process Byte"),
+                    Type::Ascii(_type_size) => println!("\tTODO: process Ascii"),
+                    Type::Short(_type_size) => println!("\tTODO: process Short"),
+                    Type::Long(_type_size) => println!("\tTODO: process Long"),
+                    Type::Rational(_type_size) => println!("\tTODO: process Rational"),
+                    Type::Sbyte(_type_size) => println!("\tTODO: process Sbyte"),
+                    Type::Undefined(_type_size) => println!("\tTODO: process Undefined"),
+                    Type::Sshort(_type_size) => println!("\tTODO: process Sshort"),
+                    Type::Slong(_type_size) => println!("\tTODO: process Slong"),
+                    Type::Srational(_type_size) => println!("\tTODO: process Srational"),
+                    Type::Float(_type_size) => println!("\tTODO: process Float"),
+                    Type::Double(_type_size) => println!("\tTODO: process Double"),
+                    _ => println!("\tTODO: this should throw an error"),
                 }
             } else {
-                if entry.offset % 2 == 1 {
+                if offset % 2 == 1 {
                     return Err(Error::new(
                         InvalidData,
                         format!(
                             "Value offset is odd and therefore not a word boundary: {}",
-                            entry.offset
+                            offset
                         ),
                     ));
                 }
-                println!("\tValue offset: {}", entry.offset);
+                println!("\tTODO: read data from offset");
             }
         }
 
@@ -258,6 +258,18 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(offset)
     }
 
+    fn read_offset(&mut self) -> Result<Offset, Error> {
+        Ok(Offset::from(self.read_u32()?))
+    }
+
+    fn read_tag(&mut self) -> Result<Tag, Error> {
+        Ok(Tag::new(self.read_u16()?))
+    }
+
+    fn read_type(&mut self) -> Result<Type, Error> {
+        Ok(Type::new(self.read_u16()?))
+    }
+
     fn read_i16(&mut self) -> Result<i16, Error> {
         let buffer: [u8; 2] = self.read()?;
         Ok(endianness::read_i16(&buffer, self.byte_order).unwrap())
@@ -266,10 +278,6 @@ impl<R: Read + Seek> TiffReader<R> {
     fn read_u16(&mut self) -> Result<u16, Error> {
         let buffer: [u8; 2] = self.read()?;
         Ok(endianness::read_u16(&buffer, self.byte_order).unwrap())
-    }
-
-    fn read_offset(&mut self) -> Result<Offset, Error> {
-        Ok(Offset::from(self.read_u32()?))
     }
 
     fn read_u32(&mut self) -> Result<u32, Error> {
