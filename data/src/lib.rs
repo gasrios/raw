@@ -12,24 +12,14 @@
 
 pub type Offset = u64;
 
-pub struct IfdEntry<V> {
+pub struct IfdEntry {
     pub tag: Tag,
     pub type_: Type,
     pub count: u32,
-    pub value: V,
+    pub offset: Offset,
 }
 
-impl<V> IfdEntry<V> {
-    #[must_use]
-    pub const fn new(tag: Tag, type_: Type, count: u32, value: V) -> IfdEntry<V> {
-        IfdEntry {
-            tag,
-            type_,
-            count,
-            value,
-        }
-    }
-
+impl IfdEntry {
     #[must_use]
     pub const fn size_in_bytes(&self) -> u32 {
         self.type_.size_in_bytes() * self.count

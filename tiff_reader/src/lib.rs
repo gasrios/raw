@@ -161,7 +161,6 @@ impl<R: Read + Seek> TiffReader<R> {
                 break;
             }
 
-            // TODO we don't need this anymore, self.read_type should have failed above
             if type_ == Type::Unknown(0) {
                 return Err(Error::new(
                     InvalidData,
@@ -190,11 +189,17 @@ impl<R: Read + Seek> TiffReader<R> {
             let offset: Offset = self.read_offset()?;
 
             // TODO only create this after we process offset and get the actual data
-            let entry: IfdEntry<Offset> = IfdEntry::new(tag, type_, count, offset);
+            let entry: IfdEntry =
+                IfdEntry {
+                    tag,
+                    type_,
+                    count,
+                    offset,
+                };
             println!("Tag: {:?}", entry.tag);
             println!("\tType: {:?}", entry.type_);
             println!("\tNumber of values: {}", entry.count);
-            println!("\tValue: {}", entry.value);
+            println!("\tOffset: {}", entry.offset);
 
             /*
              * The Value is expected to begin on a word boundary; the corresponding Value Offset will
