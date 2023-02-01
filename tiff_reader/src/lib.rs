@@ -12,22 +12,21 @@
 
 use data::{IfdEntry, Offset, Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
-use std::fs::File;
 use std::io::{
-    BufReader, Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom,
+    Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom,
 };
 
 // TODO use generics in the declaration of TiffReader
-pub struct TiffReader {
-    reader: BufReader<File>,
+pub struct TiffReader<R> {
+    reader: R,
     byte_order: ByteOrder,
 }
 
-impl TiffReader {
+impl<R: Read + Seek> TiffReader<R> {
     /// # Errors
     ///
     /// TODO add docs
-    pub fn new(reader: BufReader<File>) -> Result<TiffReader, Error> {
+    pub fn new(reader: R) -> Result<TiffReader<R>, Error> {
         Ok(TiffReader {
             reader,
             /*

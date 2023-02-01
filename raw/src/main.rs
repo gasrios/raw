@@ -19,7 +19,7 @@ use tiff_reader::TiffReader;
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
-        let mut tiff_reader: TiffReader = TiffReader::new(BufReader::new(File::open(file_name)?))?;
+        let mut tiff_reader: TiffReader<BufReader<File>> = TiffReader::new(BufReader::new(File::open(file_name)?))?;
         {
             // TODO move this code block to tiff_reader::TiffReader, make if return a data structure
             let mut offset: Offset = tiff_reader.process_header()?;
