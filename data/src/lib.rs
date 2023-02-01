@@ -38,7 +38,75 @@ impl IfdEntry {
 
 // TODO Tag and Type should be in separate modules and files
 
-#[derive(Clone, Copy, Debug)]
+impl Tag {
+    #[must_use]
+    pub const fn new(tag: u16) -> Tag {
+        match tag {
+            254 => Tag::NewSubFileType,
+            256 => Tag::ImageWidth,
+            257 => Tag::ImageLength,
+            258 => Tag::BitsPerSample,
+            259 => Tag::Compression,
+            262 => Tag::PhotometricInterpretation,
+            271 => Tag::Make,
+            272 => Tag::Model,
+            273 => Tag::StripOffsets,
+            274 => Tag::Orientation,
+            277 => Tag::SamplesPerPixel,
+            278 => Tag::RowsPerStrip,
+            279 => Tag::StripByteCounts,
+            284 => Tag::PlanarConfiguration,
+            305 => Tag::Software,
+            306 => Tag::DateTime,
+            315 => Tag::Artist,
+            330 => Tag::SubIFDs,
+            700 => Tag::XMP,
+            33432 => Tag::Copyright,
+            34665 => Tag::ExifIFD,
+            37393 => Tag::ImageNumber,
+            50706 => Tag::DNGVersion,
+            50707 => Tag::DNGBackwardVersion,
+            50708 => Tag::UniqueCameraModel,
+            50709 => Tag::LocalizedCameraModel,
+            50721 => Tag::ColorMatrix1,
+            50722 => Tag::ColorMatrix2,
+            50723 => Tag::CameraCalibration1,
+            50724 => Tag::CameraCalibration2,
+            50727 => Tag::AnalogBalance,
+            50728 => Tag::AsShotNeutral,
+            50730 => Tag::BaselineExposure,
+            50731 => Tag::BaselineNoise,
+            50732 => Tag::BaselineSharpness,
+            50733 => Tag::BayerGreenSplit,
+            50734 => Tag::LinearResponseLimit,
+            50735 => Tag::CameraSerialNumber,
+            50736 => Tag::LensInfo,
+            50739 => Tag::ShadowScale,
+            50740 => Tag::DNGPrivateData,
+            50778 => Tag::CalibrationIlluminant1,
+            50779 => Tag::CalibrationIlluminant2,
+            50781 => Tag::RawDataUniqueID,
+            50827 => Tag::OriginalRawFileName,
+            50931 => Tag::CameraCalibrationSignature,
+            50932 => Tag::ProfileCalibrationSignature,
+            50936 => Tag::ProfileName,
+            50941 => Tag::ProfileEmbedPolicy,
+            50942 => Tag::ProfileCopyright,
+            50964 => Tag::ForwardMatrix1,
+            50965 => Tag::ForwardMatrix2,
+            50966 => Tag::PreviewApplicationName,
+            50967 => Tag::PreviewApplicationVersion,
+            50969 => Tag::PreviewSettingsDigest,
+            50970 => Tag::PreviewColorSpace,
+            50971 => Tag::PreviewDateTime,
+            50972 => Tag::RawImageDigest,
+            51041 => Tag::NoiseProfile,
+            _ => Tag::Unknown,
+        }
+    }
+}
+
+#[derive(Debug)]
 pub enum Tag {
     Unknown,
     // Digital Negative Specification, Version 1.4.0.0, page 18
@@ -181,92 +249,6 @@ pub enum Tag {
     NoiseProfile,
 }
 
-impl Tag {
-    #[must_use]
-    pub const fn new(tag: u16) -> Tag {
-        match tag {
-            254 => Tag::NewSubFileType,
-            256 => Tag::ImageWidth,
-            257 => Tag::ImageLength,
-            258 => Tag::BitsPerSample,
-            259 => Tag::Compression,
-            262 => Tag::PhotometricInterpretation,
-            271 => Tag::Make,
-            272 => Tag::Model,
-            273 => Tag::StripOffsets,
-            274 => Tag::Orientation,
-            277 => Tag::SamplesPerPixel,
-            278 => Tag::RowsPerStrip,
-            279 => Tag::StripByteCounts,
-            284 => Tag::PlanarConfiguration,
-            305 => Tag::Software,
-            306 => Tag::DateTime,
-            315 => Tag::Artist,
-            330 => Tag::SubIFDs,
-            700 => Tag::XMP,
-            33432 => Tag::Copyright,
-            34665 => Tag::ExifIFD,
-            37393 => Tag::ImageNumber,
-            50706 => Tag::DNGVersion,
-            50707 => Tag::DNGBackwardVersion,
-            50708 => Tag::UniqueCameraModel,
-            50709 => Tag::LocalizedCameraModel,
-            50721 => Tag::ColorMatrix1,
-            50722 => Tag::ColorMatrix2,
-            50723 => Tag::CameraCalibration1,
-            50724 => Tag::CameraCalibration2,
-            50727 => Tag::AnalogBalance,
-            50728 => Tag::AsShotNeutral,
-            50730 => Tag::BaselineExposure,
-            50731 => Tag::BaselineNoise,
-            50732 => Tag::BaselineSharpness,
-            50733 => Tag::BayerGreenSplit,
-            50734 => Tag::LinearResponseLimit,
-            50735 => Tag::CameraSerialNumber,
-            50736 => Tag::LensInfo,
-            50739 => Tag::ShadowScale,
-            50740 => Tag::DNGPrivateData,
-            50778 => Tag::CalibrationIlluminant1,
-            50779 => Tag::CalibrationIlluminant2,
-            50781 => Tag::RawDataUniqueID,
-            50827 => Tag::OriginalRawFileName,
-            50931 => Tag::CameraCalibrationSignature,
-            50932 => Tag::ProfileCalibrationSignature,
-            50936 => Tag::ProfileName,
-            50941 => Tag::ProfileEmbedPolicy,
-            50942 => Tag::ProfileCopyright,
-            50964 => Tag::ForwardMatrix1,
-            50965 => Tag::ForwardMatrix2,
-            50966 => Tag::PreviewApplicationName,
-            50967 => Tag::PreviewApplicationVersion,
-            50969 => Tag::PreviewSettingsDigest,
-            50970 => Tag::PreviewColorSpace,
-            50971 => Tag::PreviewDateTime,
-            50972 => Tag::RawImageDigest,
-            51041 => Tag::NoiseProfile,
-            _ => Tag::Unknown,
-        }
-    }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Type {
-    Unknown(u32),
-    Byte(u32),
-    Ascii(u32),
-    Short(u32),
-    Long(u32),
-    Rational(u32),
-    Sbyte(u32),
-    Undefined(u32),
-    Sshort(u32),
-    Slong(u32),
-    Srational(u32),
-    Float(u32),
-    Double(u32),
-    Unexpected(u32),
-}
-
 /*
  * From TIFF 6.0 Specification, page 14
  *
@@ -333,4 +315,22 @@ impl Type {
             | Type::Double(size_in_bytes) => *size_in_bytes,
         }
     }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum Type {
+    Unknown(u32),
+    Byte(u32),
+    Ascii(u32),
+    Short(u32),
+    Long(u32),
+    Rational(u32),
+    Sbyte(u32),
+    Undefined(u32),
+    Sshort(u32),
+    Slong(u32),
+    Srational(u32),
+    Float(u32),
+    Double(u32),
+    Unexpected(u32),
 }
