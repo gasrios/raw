@@ -12,9 +12,7 @@
 
 use data::{IfdEntry, Offset, Tag, Type};
 use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
-use std::io::{
-    Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom,
-};
+use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 
 // TODO use generics in the declaration of TiffReader
 pub struct TiffReader<R> {
