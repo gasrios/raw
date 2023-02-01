@@ -38,3 +38,7 @@ build: check
 clean:
 	cargo clean
 	rm -f Cargo.lock
+
+.PHONY: todo
+todo:
+	egrep 'TODO|FIXME' $(shell find -type f -name '*.rs') | sed 's/^\([^:]\+:\) *\(.*\)/\1 \2/'
