@@ -11,12 +11,12 @@
  */
 
 use data::{IfdEntry, Offset, Tag, Type};
-use endianness::{ByteOrder, ByteOrder::BigEndian, ByteOrder::LittleEndian};
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
+use Endianness::{BigEndian, LittleEndian};
 
 pub struct TiffReader<R> {
     reader: R,
-    byte_order: ByteOrder,
+    endianness: Endianness,
 }
 
 impl<R: Read + Seek> TiffReader<R> {
@@ -26,9 +26,9 @@ impl<R: Read + Seek> TiffReader<R> {
     pub fn new(reader: R) -> Result<TiffReader<R>, Error> {
         Ok(TiffReader {
             reader,
-            // It does not matter which value we initialize byte_order with, process_header() will
+            // It does not matter which value we initialize endianness with, process_header() will
             // set the right value later.
-            byte_order: BigEndian,
+            endianness: BigEndian,
         })
     }
 
@@ -55,9 +55,9 @@ impl<R: Read + Seek> TiffReader<R> {
          */
         let buffer: [u8; 2] = self.read()?;
         if buffer[0] == 0x49 && buffer[1] == 0x49 {
-            self.byte_order = LittleEndian;
+            self.endianness = LittleEndian;
         } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
-            self.byte_order = BigEndian;
+            self.endianness = BigEndian;
         } else {
             return Err(Error::new(
             InvalidData,
@@ -276,17 +276,36 @@ impl<R: Read + Seek> TiffReader<R> {
 
     fn read_i16(&mut self) -> Result<i16, Error> {
         let buffer: [u8; 2] = self.read()?;
-        Ok(endianness::read_i16(&buffer, self.byte_order).unwrap())
+        Ok(match self.endianness {
+            LittleEndian => (i16::from(buffer[1]) << 8) + i16::from(buffer[0]),
+            BigEndian => (i16::from(buffer[0]) << 8) + i16::from(buffer[1]),
+        })
     }
 
     fn read_u16(&mut self) -> Result<u16, Error> {
         let buffer: [u8; 2] = self.read()?;
-        Ok(endianness::read_u16(&buffer, self.byte_order).unwrap())
+        Ok(match self.endianness {
+            LittleEndian => (u16::from(buffer[1]) << 8) + u16::from(buffer[0]),
+            BigEndian => (u16::from(buffer[0]) << 8) + u16::from(buffer[1]),
+        })
     }
 
     fn read_u32(&mut self) -> Result<u32, Error> {
         let buffer: [u8; 4] = self.read()?;
-        Ok(endianness::read_u32(&buffer, self.byte_order).unwrap())
+        Ok(match self.endianness {
+            LittleEndian => {
+                (u32::from(buffer[3]) << 24)
+                    + (u32::from(buffer[2]) << 16)
+                    + (u32::from(buffer[1]) << 8)
+                    + u32::from(buffer[0])
+            }
+            BigEndian => {
+                (u32::from(buffer[0]) << 24)
+                    + (u32::from(buffer[1]) << 16)
+                    + (u32::from(buffer[2]) << 8)
+                    + u32::from(buffer[3])
+            }
+        })
     }
 
     fn read<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
@@ -300,4 +319,10 @@ impl<R: Read + Seek> TiffReader<R> {
         }
         Ok(buffer)
     }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum Endianness {
+    BigEndian,
+    LittleEndian,
 }

@@ -12,5 +12,4 @@ categories  = ["multimedia::images"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-endianness = "0.2"
 data       = { path = "../data" }

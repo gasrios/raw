@@ -16,6 +16,7 @@ pub struct IfdEntry {
     pub tag: Tag,
     pub type_: Type,
     pub count: u32,
+    // TODO instead of storing offset, store raw_data = &[u8], the bytes as read from file
     pub offset: Offset,
 }
 
