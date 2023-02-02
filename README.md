@@ -17,7 +17,7 @@ Keep in mind TIFF is a decades old file format that has been receiving extension
 * TIFF Revision 6.0 Final - June 3, 1992
 * TIFF Technical Note 1: TIFF Trees
 * ISO 12234-2:2001, Electronic still-picture imaging – Removable memory – Part 2: TIFF/EP image data format
-* [Digital Negative (DNG) Specification Version 1.6.0.0](https://helpx.adobe.com/content/dam/help/en/photoshop/pdf/dng_spec_1_6_0_0.pdf)
+* Digital Negative (DNG) Specification Version 1.4.0.0
 _____
 ## Copyright & License
 

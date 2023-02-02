@@ -7,17 +7,10 @@ name = "data"
 version = "0.0.0"
 
 [[package]]
-name = "endianness"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a436ddc6a16e6d54d8dcd33162f355c2e0d18ef63c2687bcc69423862a3db256"
-
-[[package]]
 name = "raw"
 version = "0.0.0"
 dependencies = [
  "data",
- "endianness",
  "tiff_reader",
 ]
 
@@ -25,5 +18,5 @@ dependencies = [
 name = "tiff_reader"
 version = "0.0.0"
 dependencies = [
- "endianness",
+ "data",
 ]
