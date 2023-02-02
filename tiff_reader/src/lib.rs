@@ -157,11 +157,11 @@ impl<R: Read + Seek> TiffReader<R> {
              * Warning: It is possible that other TIFF field types will be added in the future. Readers should
              *          skip over fields containing an unexpected field type.
              */
-            if type_ == Type::Unexpected(0) {
+            if type_ == Type::Unexpected {
                 break;
             }
 
-            if type_ == Type::Unknown(0) {
+            if type_ == Type::Unknown {
                 return Err(Error::new(
                     InvalidData,
                     format!("Invalid IFD Entry type: {type_:?}",),

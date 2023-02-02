@@ -266,7 +266,7 @@ impl Type {
     #[must_use]
     pub const fn new(type_: u16) -> Type {
         match type_ {
-            0 => Type::Unknown(0),
+            0 => Type::Unknown,
             1 => Type::Byte(1),
             2 => Type::Ascii(1),
             3 => Type::Short(2),
@@ -279,7 +279,7 @@ impl Type {
             10 => Type::Srational(8),
             11 => Type::Float(4),
             12 => Type::Double(8),
-            _ => Type::Unexpected(0),
+            _ => Type::Unexpected,
         }
     }
 
@@ -290,9 +290,7 @@ impl Type {
     #[must_use]
     pub const fn size_in_bytes(&self) -> u32 {
         match &self {
-            Type::Unknown(size_in_bytes)
-            | Type::Unexpected(size_in_bytes)
-            | Type::Byte(size_in_bytes)
+            Type::Byte(size_in_bytes)
             | Type::Ascii(size_in_bytes)
             | Type::Sbyte(size_in_bytes)
             | Type::Undefined(size_in_bytes)
@@ -304,13 +302,14 @@ impl Type {
             | Type::Rational(size_in_bytes)
             | Type::Srational(size_in_bytes)
             | Type::Double(size_in_bytes) => *size_in_bytes,
+            _ => 0
         }
     }
 }
 
 #[derive(Debug, Eq, PartialEq)]
 pub enum Type {
-    Unknown(u32),
+    Unknown,
     Byte(u32),
     Ascii(u32),
     Short(u32),
@@ -323,5 +322,5 @@ pub enum Type {
     Srational(u32),
     Float(u32),
     Double(u32),
-    Unexpected(u32),
+    Unexpected,
 }
