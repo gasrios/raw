@@ -302,7 +302,7 @@ impl Type {
             | Type::Rational(size_in_bytes)
             | Type::Srational(size_in_bytes)
             | Type::Double(size_in_bytes) => *size_in_bytes,
-            _ => 0
+            _ => 0,
         }
     }
 }
