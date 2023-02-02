@@ -321,8 +321,8 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum Endianness {
+#[derive(Debug)]
+enum Endianness {
     BigEndian,
     LittleEndian,
 }

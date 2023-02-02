@@ -13,8 +13,7 @@
 use data::Offset;
 use std::env::args;
 use std::fs::File;
-use std::io::BufReader;
-use std::io::{Error, ErrorKind::InvalidData};
+use std::io::{BufReader, Error, ErrorKind::InvalidData};
 use tiff_reader::TiffReader;
 
 fn main() -> Result<(), Error> {
