@@ -1,13 +1,16 @@
 /*
  * © 2023 Guilherme Rios All Rights Reserved
  *
- * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation, version 3 of the License.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the
+ * GNU General Public License as published by the Free Software Foundation, version 3 of the
+ * License.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty
- * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ * without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
+ * the GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License along with this program. If not, see http://www.gnu.org/licenses/.
+ * You should have received a copy of the GNU General Public License along with this program. If
+ * not, see http://www.gnu.org/licenses/.
  */
 
 use data::{IfdEntry, Offset, Tag, Type};
@@ -41,7 +44,8 @@ impl<R: Read + Seek> TiffReader<R> {
          *
          * Image File Header
          *
-         * A TIFF file begins with an 8-byte image file header, containing the following information:
+         * A TIFF file begins with an 8-byte image file header, containing the following
+         * information:
          *
          * Bytes 0-1: The byte order used within the file. Legal values are:
          *            “II” (4949.H)
@@ -91,14 +95,18 @@ impl<R: Read + Seek> TiffReader<R> {
          *            The term byte offset is always used in this document to refer to a
          *            location with respect to the beginning of the TIFF file. The first byte
          *            of the file has an offset of 0.
+         *
+         * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the type
+         *       std::io::BufReader expects.
          */
         let offset: Offset = self.read_offset()?;
 
         /*
-         * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and each
-         * IFD must have at least one entry."
+         * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and
+         * each IFD must have at least one entry."
          *
-         * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the file.
+         * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the
+         * file.
          *
          */
         if offset < 8 {
@@ -112,6 +120,10 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     /// # Errors
+    ///
+    /// TODO add docs
+    ///
+    /// # Panics
     ///
     /// TODO add docs
     // TODO do not return offset, struct containing all info (including offset)
@@ -154,8 +166,8 @@ impl<R: Read + Seek> TiffReader<R> {
             /*
              * From TIFF 6.0 Specification, page 14
              *
-             * Warning: It is possible that other TIFF field types will be added in the future. Readers should
-             *          skip over fields containing an unexpected field type.
+             * Warning: It is possible that other TIFF field types will be added in the future.
+             *          Readers should skip over fields containing an unexpected field type.
              */
             if type_ == Type::Unexpected {
                 break;
@@ -180,90 +192,114 @@ impl<R: Read + Seek> TiffReader<R> {
                 ));
             }
 
-            /*
-             * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the field.
-             *
-             * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the type
-             *       std::io::BufReader expects.
-             */
-            let offset: Offset = self.read_offset()?;
-
-            // TODO only create this after we process offset and get the actual data
-            let entry: IfdEntry = IfdEntry {
-                tag,
-                type_,
-                count,
-                offset,
-            };
-            println!("Tag: {:?}", entry.tag);
-            println!("\tType: {:?}", entry.type_);
-            println!("\tNumber of values: {}", entry.count);
-            println!("\tOffset: {}", entry.offset);
+            let mut raw_data: Vec<u8>;
+            let ifd_entry_size: usize = usize::try_from(count * type_.size_in_bytes()).unwrap();
 
             /*
-             * The Value is expected to begin on a word boundary; the corresponding Value Offset will
-             * thus be an even number. This file offset may point anywhere in the file, even after the
-             * image data.
-             *
              * From TIFF 6.0 Specification, page 15
              *
              * Value/Offset
              *
-             * To save time and space the Value Offset contains the Value instead of pointing to the
-             * Value if and only if the Value fits into 4 bytes. If the Value is shorter than 4 bytes,
-             * it is left-justified within the 4-byte Value Offset, i.e., stored in the lower-numbered
-             * bytes. Whether the Value fits within 4 bytes is determined by the Type and Count of the
-             * field.
+             * To save time and space the Value Offset contains the Value instead of pointing to
+             * the Value if and only if the Value fits into 4 bytes. If the Value is shorter than 4
+             * bytes, it is left-justified within the 4-byte Value Offset, i.e., stored in the
+             * lower-numbered bytes. Whether the Value fits within 4 bytes is determined by the
+             * Type and Count of the field.
              */
-            if entry.size_in_bytes() < 5 {
-                match entry.type_ {
-                    Type::Byte(_type_size) => println!("\tTODO: process Byte"),
-                    Type::Ascii(_type_size) => println!("\tTODO: process Ascii"),
-                    Type::Short(_type_size) => println!("\tTODO: process Short"),
-                    Type::Long(_type_size) => println!("\tTODO: process Long"),
-                    Type::Rational(_type_size) => println!("\tTODO: process Rational"),
-                    Type::Sbyte(_type_size) => println!("\tTODO: process Sbyte"),
-                    Type::Undefined(_type_size) => println!("\tTODO: process Undefined"),
-                    Type::Sshort(_type_size) => println!("\tTODO: process Sshort"),
-                    Type::Slong(_type_size) => println!("\tTODO: process Slong"),
-                    Type::Srational(_type_size) => println!("\tTODO: process Srational"),
-                    Type::Float(_type_size) => println!("\tTODO: process Float"),
-                    Type::Double(_type_size) => println!("\tTODO: process Double"),
-                    _ => println!("\tTODO: this should throw an error"),
+            if ifd_entry_size > 4 {
+                /*
+                 * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the
+                 * field.
+                 *
+                 * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the
+                 *       type std::io::BufReader expects.
+                 */
+                let offset: Offset = self.read_offset()?;
+                let current_offset: Offset = self.reader.stream_position()?;
+                self.reader.seek(SeekFrom::Start(offset))?;
+
+                /*
+                 * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
+                 * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
+                 *
+                 * This is a Rust hack, but it is OK, because we do not read data, we just want to
+                 * make sure the vector has the right size, so we can read stuff into it.
+                 */
+                raw_data = Vec::with_capacity(ifd_entry_size);
+                raw_data.spare_capacity_mut();
+                unsafe {
+                    raw_data.set_len(ifd_entry_size);
                 }
-            } else {
-                if offset % 2 == 1 {
+
+                let bytes_read: usize = self.reader.read(&mut raw_data[..])?;
+                if bytes_read != ifd_entry_size {
                     return Err(Error::new(
-                        InvalidData,
-                        format!(
-                            "Value offset is odd and therefore not a word boundary: {}",
-                            offset
-                        ),
+                        UnexpectedEof,
+                        format!("Tried to read {ifd_entry_size} bytes, found only {bytes_read} bytes available"),
                     ));
                 }
-                println!("\tTODO: read data from offset");
+
+                self.reader.seek(SeekFrom::Start(current_offset))?;
+            } else {
+                /*
+                 * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
+                 * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
+                 *
+                 * This is a Rust hack, but it is OK, because we do not read data, we just want to
+                 * make sure the vector has the right size, so we can read stuff into it.
+                 */
+                raw_data = Vec::with_capacity(ifd_entry_size);
+                raw_data.spare_capacity_mut();
+                unsafe {
+                    raw_data.set_len(ifd_entry_size);
+                }
+
+                let bytes_read: usize = self.reader.read(&mut raw_data[..])?;
+                if bytes_read != ifd_entry_size {
+                    return Err(Error::new(
+                        UnexpectedEof,
+                        format!("Tried to read {ifd_entry_size} bytes, found only {bytes_read} bytes available"),
+                    ));
+                }
+                self.reader
+                    .seek(SeekFrom::Current((4 - ifd_entry_size).try_into().unwrap()))?;
             }
+
+            let entry: IfdEntry = IfdEntry {
+                tag,
+                type_,
+                count,
+                raw_data: &raw_data,
+            };
+            println!("Tag: {:?}", entry.tag);
+            println!("\tType: {:?}", entry.type_);
+            println!("\tNumber of values: {}", entry.count);
+            println!("\tValue: {:?}", entry.raw_data);
         }
 
         let offset: Offset = self.read_offset()?;
-        /*
-         * From TIFF 6.0 Specification, page 13
-         *
-         * The directory may be at any location in the file after the header but must begin on
-         * a word boundary.
-         */
-        if offset % 2 == 1 {
-            return Err(Error::new(
-                InvalidData,
-                format!("Value offset is odd and therefore not a word boundary: {offset}"),
-            ));
-        }
 
         Ok(offset)
     }
 
+    /*
+     * From TIFF 6.0 Specification, page 13
+     *
+     * The directory may be at any location in the file after the header but must begin on
+     * a word boundary.
+     */
     fn read_offset(&mut self) -> Result<Offset, Error> {
-        Ok(Offset::from(self.read_u32()?))
+        let offset: Offset = Offset::from(self.read_u32()?);
+        if offset % 2 == 1 {
+            return Err(Error::new(
+                InvalidData,
+                format!(
+                    "Value offset is odd and therefore not a word boundary: {}",
+                    offset
+                ),
+            ));
+        }
+        Ok(offset)
     }
 
     fn read_tag(&mut self) -> Result<Tag, Error> {
