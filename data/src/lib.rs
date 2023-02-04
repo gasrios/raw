@@ -359,24 +359,24 @@ impl Type {
     }
 
     /*
-     * I really wish I could just write _(size_in_bytes) => *size_in_bytes or access the data as a
-     * property of the enum, like type_.size_in_bytes, without this boilerplate code.
+     * I really wish I could just write _(size) => *size or access the data as a property of the
+     * enum, like type_.size, without this boilerplate code.
      */
     #[must_use]
-    pub const fn size_in_bytes(&self) -> u32 {
+    pub const fn size(&self) -> u32 {
         match &self {
-            Type::Byte(size_in_bytes)
-            | Type::Ascii(size_in_bytes)
-            | Type::Sbyte(size_in_bytes)
-            | Type::Undefined(size_in_bytes)
-            | Type::Short(size_in_bytes)
-            | Type::Sshort(size_in_bytes)
-            | Type::Long(size_in_bytes)
-            | Type::Slong(size_in_bytes)
-            | Type::Float(size_in_bytes)
-            | Type::Rational(size_in_bytes)
-            | Type::Srational(size_in_bytes)
-            | Type::Double(size_in_bytes) => *size_in_bytes,
+            Type::Byte(size)
+            | Type::Ascii(size)
+            | Type::Sbyte(size)
+            | Type::Undefined(size)
+            | Type::Short(size)
+            | Type::Sshort(size)
+            | Type::Long(size)
+            | Type::Slong(size)
+            | Type::Float(size)
+            | Type::Rational(size)
+            | Type::Srational(size)
+            | Type::Double(size) => *size,
             _ => 0,
         }
     }

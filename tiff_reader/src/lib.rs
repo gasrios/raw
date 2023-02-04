@@ -17,6 +17,11 @@ use data::{IfdEntry, Offset, Tag, Type};
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 use Endianness::{BigEndian, LittleEndian};
 
+enum Endianness {
+    BigEndian,
+    LittleEndian,
+}
+
 pub struct TiffReader<R> {
     reader: R,
     endianness: Endianness,
@@ -57,7 +62,7 @@ impl<R: Read + Seek> TiffReader<R> {
          *            from most significant to least significant, for both 16-bit and 32-bit
          *            integers. This is called big-endian byte order.
          */
-        let buffer: [u8; 2] = self.read()?;
+        let buffer: [u8; 2] = self.read_in_stack()?;
         if buffer[0] == 0x49 && buffer[1] == 0x49 {
             self.endianness = LittleEndian;
         } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
@@ -95,9 +100,6 @@ impl<R: Read + Seek> TiffReader<R> {
          *            The term byte offset is always used in this document to refer to a
          *            location with respect to the beginning of the TIFF file. The first byte
          *            of the file has an offset of 0.
-         *
-         * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the type
-         *       std::io::BufReader expects.
          */
         let offset: Offset = self.read_offset()?;
 
@@ -192,10 +194,13 @@ impl<R: Read + Seek> TiffReader<R> {
                 ));
             }
 
-            let mut raw_data: Vec<u8>;
-            let ifd_entry_size: usize = usize::try_from(count * type_.size_in_bytes()).unwrap();
+            let raw_data: Vec<u8>;
+            let size: usize = usize::try_from(count * type_.size()).unwrap();
 
             /*
+             * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the
+             * field.
+             *
              * From TIFF 6.0 Specification, page 15
              *
              * Value/Offset
@@ -206,63 +211,16 @@ impl<R: Read + Seek> TiffReader<R> {
              * lower-numbered bytes. Whether the Value fits within 4 bytes is determined by the
              * Type and Count of the field.
              */
-            if ifd_entry_size > 4 {
-                /*
-                 * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the
-                 * field.
-                 *
-                 * Note: under the hood, tiff_reader converts offset from u32 to u64, which is the
-                 *       type std::io::BufReader expects.
-                 */
+            if size > 4 {
                 let offset: Offset = self.read_offset()?;
                 let current_offset: Offset = self.reader.stream_position()?;
                 self.reader.seek(SeekFrom::Start(offset))?;
-
-                /*
-                 * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
-                 * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
-                 *
-                 * This is a Rust hack, but it is OK, because we do not read data, we just want to
-                 * make sure the vector has the right size, so we can read stuff into it.
-                 */
-                raw_data = Vec::with_capacity(ifd_entry_size);
-                raw_data.spare_capacity_mut();
-                unsafe {
-                    raw_data.set_len(ifd_entry_size);
-                }
-
-                let bytes_read: usize = self.reader.read(&mut raw_data[..])?;
-                if bytes_read != ifd_entry_size {
-                    return Err(Error::new(
-                        UnexpectedEof,
-                        format!("Tried to read {ifd_entry_size} bytes, found only {bytes_read} bytes available"),
-                    ));
-                }
-
+                raw_data = self.read_in_heap(size)?;
                 self.reader.seek(SeekFrom::Start(current_offset))?;
             } else {
-                /*
-                 * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
-                 * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
-                 *
-                 * This is a Rust hack, but it is OK, because we do not read data, we just want to
-                 * make sure the vector has the right size, so we can read stuff into it.
-                 */
-                raw_data = Vec::with_capacity(ifd_entry_size);
-                raw_data.spare_capacity_mut();
-                unsafe {
-                    raw_data.set_len(ifd_entry_size);
-                }
-
-                let bytes_read: usize = self.reader.read(&mut raw_data[..])?;
-                if bytes_read != ifd_entry_size {
-                    return Err(Error::new(
-                        UnexpectedEof,
-                        format!("Tried to read {ifd_entry_size} bytes, found only {bytes_read} bytes available"),
-                    ));
-                }
+                raw_data = self.read_in_heap(size)?;
                 self.reader
-                    .seek(SeekFrom::Current((4 - ifd_entry_size).try_into().unwrap()))?;
+                    .seek(SeekFrom::Current((4 - size).try_into().unwrap()))?;
             }
 
             let entry: IfdEntry = IfdEntry {
@@ -311,7 +269,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_i16(&mut self) -> Result<i16, Error> {
-        let buffer: [u8; 2] = self.read()?;
+        let buffer: [u8; 2] = self.read_in_stack()?;
         Ok(match self.endianness {
             LittleEndian => (i16::from(buffer[1]) << 8) + i16::from(buffer[0]),
             BigEndian => (i16::from(buffer[0]) << 8) + i16::from(buffer[1]),
@@ -319,7 +277,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_u16(&mut self) -> Result<u16, Error> {
-        let buffer: [u8; 2] = self.read()?;
+        let buffer: [u8; 2] = self.read_in_stack()?;
         Ok(match self.endianness {
             LittleEndian => (u16::from(buffer[1]) << 8) + u16::from(buffer[0]),
             BigEndian => (u16::from(buffer[0]) << 8) + u16::from(buffer[1]),
@@ -327,7 +285,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_u32(&mut self) -> Result<u32, Error> {
-        let buffer: [u8; 4] = self.read()?;
+        let buffer: [u8; 4] = self.read_in_stack()?;
         Ok(match self.endianness {
             LittleEndian => {
                 (u32::from(buffer[3]) << 24)
@@ -344,7 +302,14 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    fn read<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
+    /*
+     * This may be overoptimizing, but I already had a function to read fixed size arrays before I
+     * realized I would also need one to read vectors.
+     *
+     * I'm keeping both for the time being, and may remove read_in_stack() in case it looks like it
+     * became redundant and offers no benefit.
+     */
+    fn read_in_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
         let mut buffer: [u8; SIZE] = [0u8; SIZE];
         let bytes_read: usize = self.reader.read(&mut buffer)?;
         if bytes_read != SIZE {
@@ -355,10 +320,28 @@ impl<R: Read + Seek> TiffReader<R> {
         }
         Ok(buffer)
     }
-}
 
-#[derive(Debug)]
-enum Endianness {
-    BigEndian,
-    LittleEndian,
+    fn read_in_heap(&mut self, size: usize) -> Result<Vec<u8>, Error> {
+        /*
+         * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
+         * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
+         *
+         * This is a Rust hack, but it is OK, because we do not read data, we just want to
+         * make sure the vector has the right size, so we can read stuff into it.
+         */
+        let mut buffer: Vec<u8> = Vec::with_capacity(size);
+        buffer.spare_capacity_mut();
+        unsafe {
+            buffer.set_len(size);
+        }
+
+        let bytes_read: usize = self.reader.read(&mut buffer[..])?;
+        if bytes_read != size {
+            return Err(Error::new(
+                UnexpectedEof,
+                format!("Tried to read {size} bytes, found only {bytes_read} bytes available"),
+            ));
+        }
+        Ok(buffer)
+    }
 }
