@@ -13,7 +13,8 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
-use data::{IfdEntry, Offset, Tag, Type};
+use data::{Field, Ifd, Offset, Tag, Type};
+use std::collections::HashMap;
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 use Endianness::{BigEndian, LittleEndian};
 
@@ -128,8 +129,7 @@ impl<R: Read + Seek> TiffReader<R> {
     /// # Panics
     ///
     /// TODO add docs
-    // TODO do not return offset, struct containing all info (including offset)
-    pub fn process_ifd(&mut self, offset: Offset) -> Result<Offset, Error> {
+    pub fn process_ifd(&mut self, offset: Offset) -> Result<Ifd, Error> {
         self.reader.seek(SeekFrom::Start(offset))?;
         /*
          * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
@@ -150,6 +150,7 @@ impl<R: Read + Seek> TiffReader<R> {
          */
         let number_of_fields: u16 = self.read_u16()?;
 
+        let mut fields = HashMap::new();
         for _i in 0..number_of_fields {
             /*
              * IFD Entry
@@ -159,6 +160,14 @@ impl<R: Read + Seek> TiffReader<R> {
              * Bytes 0-1 The Tag that identifies the field.
              */
             let tag: Tag = self.read_tag()?;
+
+            /*
+             * TODO we do not need to know or process all tags, uncomment this after testing is
+             * done
+            if tag == Tag::Unknown {
+                break;
+            }
+             */
 
             /*
              * Bytes 2-3 The field Type.
@@ -178,7 +187,7 @@ impl<R: Read + Seek> TiffReader<R> {
             if type_ == Type::Unknown {
                 return Err(Error::new(
                     InvalidData,
-                    format!("Invalid IFD Entry type: {type_:?}",),
+                    format!("Invalid field type: {type_:?}",),
                 ));
             }
 
@@ -190,7 +199,7 @@ impl<R: Read + Seek> TiffReader<R> {
             if count < 1 {
                 return Err(Error::new(
                     InvalidData,
-                    format!("IFD Entry should have at least one value: {count}"),
+                    format!("Field should have at least one value: {count}"),
                 ));
             }
 
@@ -223,21 +232,18 @@ impl<R: Read + Seek> TiffReader<R> {
                     .seek(SeekFrom::Current((4 - size).try_into().unwrap()))?;
             }
 
-            let entry: IfdEntry = IfdEntry {
-                tag,
+            let field: Field = Field {
                 type_,
                 count,
-                raw_data: &raw_data,
+                raw_data,
             };
-            println!("Tag: {:?}", entry.tag);
-            println!("\tType: {:?}", entry.type_);
-            println!("\tNumber of values: {}", entry.count);
-            println!("\tValue: {:?}", entry.raw_data);
+            fields.insert(tag, field);
         }
 
-        let offset: Offset = self.read_offset()?;
-
-        Ok(offset)
+        Ok(Ifd {
+            fields,
+            offset: self.read_offset()?,
+        })
     }
 
     /*
@@ -304,10 +310,11 @@ impl<R: Read + Seek> TiffReader<R> {
 
     /*
      * This may be overoptimizing, but I already had a function to read fixed size arrays before I
-     * realized I would also need one to read vectors.
+     * realized I would also need one to read vectors. Or I might trust std::io::BufReader and only
+     * do fixed size reading.
      *
-     * I'm keeping both for the time being, and may remove read_in_stack() in case it looks like it
-     * became redundant and offers no benefit.
+     * I'm keeping both for the time being, but may remove one in case it looks like it became
+     * redundant and offers no benefit.
      */
     fn read_in_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
         let mut buffer: [u8; SIZE] = [0u8; SIZE];

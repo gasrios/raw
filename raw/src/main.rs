@@ -30,7 +30,16 @@ fn main() -> Result<(), Error> {
              */
             let mut offset: Offset = tiff_reader.process_header()?;
             loop {
-                offset = tiff_reader.process_ifd(offset)?;
+                let ifd = tiff_reader.process_ifd(offset)?;
+
+                for key in ifd.fields.keys() {
+                    println!("Tag: {key:?}");
+                    if let Some(field) = ifd.fields.get(key) {
+                        println!("\tType: {:?}", field.type_);
+                        println!("\tNumber of values: {}", field.count);
+                        println!("\tValue: {:?}", field.raw_data);
+                    }
+                }
 
                 /*
                  * From TIFF 6.0 Specification, page 14
@@ -38,9 +47,11 @@ fn main() -> Result<(), Error> {
                  * An Image File Directory (IFD) consists of (...) followed by a 4-byte offset of
                  * the next IFD (or 0 if none).
                  */
-                if offset == 0 {
+                if ifd.offset == 0 {
                     break;
                 }
+
+                offset = ifd.offset;
             }
         }
     } else {

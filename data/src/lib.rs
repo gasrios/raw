@@ -13,16 +13,110 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
+use std::collections::HashMap;
+
 pub type Offset = u64;
 
-pub struct IfdEntry<'a> {
-    pub tag: Tag,
+pub struct Ifd {
+    pub fields: HashMap<Tag, Field>,
+    pub offset: Offset,
+}
+
+pub struct Field {
     pub type_: Type,
     pub count: u32,
-    pub raw_data: &'a [u8],
+    pub raw_data: Vec<u8>,
 }
 
 // TODO Tag and Type should be in separate modules and files
+
+/*
+ * From TIFF 6.0 Specification, page 14
+ *
+ * Types
+ *
+ * The field types and their sizes are:
+ *  1 = BYTE 8-bit unsigned integer.
+ *  2 = ASCII 8-bit byte that contains a 7-bit ASCII code; the last byte must be NUL (binary zero).
+ *  3 = SHORT 16-bit (2-byte) unsigned integer.
+ *  4 = LONG 32-bit (4-byte) unsigned integer.
+ *  5 = RATIONAL Two LONGs: the first represents the numerator of a fraction; the second, the
+ *      denominator.
+ *  6 = SBYTE An 8-bit signed (twos-complement) integer.
+ *  7 = UNDEFINED An 8-bit byte that may contain anything, depending on the definition of the
+ *      field.
+ *  8 = SSHORT A 16-bit (2-byte) signed (twos-complement) integer.
+ *  9 = SLONG A 32-bit (4-byte) signed (twos-complement) integer.
+ * 10 = SRATIONAL Two SLONG’s: the first represents the numerator of a fraction, the second the
+ *      denominator.
+ * 11 = FLOAT Single precision (4-byte) IEEE format.
+ * 12 = DOUBLE Double precision (8-byte) IEEE format.
+ *
+ * Warning: It is possible that other TIFF field types will be added in the future. Readers should
+ *          skip over fields containing an unexpected field type.
+ */
+impl Type {
+    #[must_use]
+    pub const fn new(type_: u16) -> Type {
+        match type_ {
+            0 => Type::Unknown,
+            1 => Type::Byte(1),
+            2 => Type::Ascii(1),
+            3 => Type::Short(2),
+            4 => Type::Long(4),
+            5 => Type::Rational(8),
+            6 => Type::Sbyte(1),
+            7 => Type::Undefined(1),
+            8 => Type::Sshort(2),
+            9 => Type::Slong(4),
+            10 => Type::Srational(8),
+            11 => Type::Float(4),
+            12 => Type::Double(8),
+            _ => Type::Unexpected,
+        }
+    }
+
+    /*
+     * I really wish I could just write _(size) => *size or access the data as a property of the
+     * enum, like type_.size, without this boilerplate code.
+     */
+    #[must_use]
+    pub const fn size(&self) -> u32 {
+        match &self {
+            Type::Byte(size)
+            | Type::Ascii(size)
+            | Type::Sbyte(size)
+            | Type::Undefined(size)
+            | Type::Short(size)
+            | Type::Sshort(size)
+            | Type::Long(size)
+            | Type::Slong(size)
+            | Type::Float(size)
+            | Type::Rational(size)
+            | Type::Srational(size)
+            | Type::Double(size) => *size,
+            _ => 0,
+        }
+    }
+}
+
+#[derive(Debug, Eq, PartialEq)]
+pub enum Type {
+    Unknown,
+    Byte(u32),
+    Ascii(u32),
+    Short(u32),
+    Long(u32),
+    Rational(u32),
+    Sbyte(u32),
+    Undefined(u32),
+    Sshort(u32),
+    Slong(u32),
+    Srational(u32),
+    Float(u32),
+    Double(u32),
+    Unexpected,
+}
 
 impl Tag {
     #[must_use]
@@ -248,7 +342,7 @@ impl Tag {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Eq, Hash, PartialEq)]
 pub enum Tag {
     Unknown,
     NewSubFileType,
@@ -310,92 +404,4 @@ pub enum Tag {
     PreviewDateTime,
     RawImageDigest,
     NoiseProfile,
-}
-
-/*
- * From TIFF 6.0 Specification, page 14
- *
- * Types
- *
- * The field types and their sizes are:
- *  1 = BYTE 8-bit unsigned integer.
- *  2 = ASCII 8-bit byte that contains a 7-bit ASCII code; the last byte must be NUL (binary zero).
- *  3 = SHORT 16-bit (2-byte) unsigned integer.
- *  4 = LONG 32-bit (4-byte) unsigned integer.
- *  5 = RATIONAL Two LONGs: the first represents the numerator of a fraction; the second, the
- *      denominator.
- *  6 = SBYTE An 8-bit signed (twos-complement) integer.
- *  7 = UNDEFINED An 8-bit byte that may contain anything, depending on the definition of the
- *      field.
- *  8 = SSHORT A 16-bit (2-byte) signed (twos-complement) integer.
- *  9 = SLONG A 32-bit (4-byte) signed (twos-complement) integer.
- * 10 = SRATIONAL Two SLONG’s: the first represents the numerator of a fraction, the second the
- *      denominator.
- * 11 = FLOAT Single precision (4-byte) IEEE format.
- * 12 = DOUBLE Double precision (8-byte) IEEE format.
- *
- * Warning: It is possible that other TIFF field types will be added in the future. Readers should
- *          skip over fields containing an unexpected field type.
- */
-impl Type {
-    #[must_use]
-    pub const fn new(type_: u16) -> Type {
-        match type_ {
-            0 => Type::Unknown,
-            1 => Type::Byte(1),
-            2 => Type::Ascii(1),
-            3 => Type::Short(2),
-            4 => Type::Long(4),
-            5 => Type::Rational(8),
-            6 => Type::Sbyte(1),
-            7 => Type::Undefined(1),
-            8 => Type::Sshort(2),
-            9 => Type::Slong(4),
-            10 => Type::Srational(8),
-            11 => Type::Float(4),
-            12 => Type::Double(8),
-            _ => Type::Unexpected,
-        }
-    }
-
-    /*
-     * I really wish I could just write _(size) => *size or access the data as a property of the
-     * enum, like type_.size, without this boilerplate code.
-     */
-    #[must_use]
-    pub const fn size(&self) -> u32 {
-        match &self {
-            Type::Byte(size)
-            | Type::Ascii(size)
-            | Type::Sbyte(size)
-            | Type::Undefined(size)
-            | Type::Short(size)
-            | Type::Sshort(size)
-            | Type::Long(size)
-            | Type::Slong(size)
-            | Type::Float(size)
-            | Type::Rational(size)
-            | Type::Srational(size)
-            | Type::Double(size) => *size,
-            _ => 0,
-        }
-    }
-}
-
-#[derive(Debug, Eq, PartialEq)]
-pub enum Type {
-    Unknown,
-    Byte(u32),
-    Ascii(u32),
-    Short(u32),
-    Long(u32),
-    Rational(u32),
-    Sbyte(u32),
-    Undefined(u32),
-    Sshort(u32),
-    Slong(u32),
-    Srational(u32),
-    Float(u32),
-    Double(u32),
-    Unexpected,
 }
