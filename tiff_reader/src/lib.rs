@@ -311,13 +311,7 @@ impl<R: Read + Seek> TiffReader<R> {
      */
     fn read_in_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
         let mut buffer: [u8; SIZE] = [0u8; SIZE];
-        let bytes_read: usize = self.reader.read(&mut buffer)?;
-        if bytes_read != SIZE {
-            return Err(Error::new(
-                UnexpectedEof,
-                format!("Tried to read {SIZE} bytes, found only {bytes_read} bytes available"),
-            ));
-        }
+        self.read(&mut buffer)?;
         Ok(buffer)
     }
 
@@ -334,14 +328,18 @@ impl<R: Read + Seek> TiffReader<R> {
         unsafe {
             buffer.set_len(size);
         }
+        self.read(&mut buffer)?;
+        Ok(buffer)
+    }
 
-        let bytes_read: usize = self.reader.read(&mut buffer[..])?;
-        if bytes_read != size {
+    fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+        let bytes_read: usize = self.reader.read(buffer)?;
+        if bytes_read != buffer.len() {
             return Err(Error::new(
                 UnexpectedEof,
-                format!("Tried to read {size} bytes, found only {bytes_read} bytes available"),
+                format!("Tried to read {} bytes, found only {bytes_read} bytes available", buffer.len()),
             ));
         }
-        Ok(buffer)
+        Ok(())
     }
 }
