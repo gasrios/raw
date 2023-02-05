@@ -337,7 +337,10 @@ impl<R: Read + Seek> TiffReader<R> {
         if bytes_read != buffer.len() {
             return Err(Error::new(
                 UnexpectedEof,
-                format!("Tried to read {} bytes, found only {bytes_read} bytes available", buffer.len()),
+                format!(
+                    "Tried to read {} bytes, found only {bytes_read} bytes available",
+                    buffer.len()
+                ),
             ));
         }
         Ok(())
