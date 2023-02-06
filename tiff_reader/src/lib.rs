@@ -25,6 +25,7 @@ pub struct Ifd {
     pub offset: Offset,
 }
 
+#[derive(Debug)]
 pub struct Field {
     pub type_: Type,
     pub count: u32,
@@ -156,7 +157,14 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(offset)
     }
 
-    fn process_ifd(&mut self, offset: Offset) -> Result<Ifd, Error> {
+    /// # Errors
+    ///
+    /// TODO add docs
+    ///
+    /// # Panics
+    ///
+    /// TODO add docs
+    pub fn process_ifd(&mut self, offset: Offset) -> Result<Ifd, Error> {
         self.reader.seek(SeekFrom::Start(offset))?;
         /*
          * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
@@ -281,6 +289,37 @@ impl<R: Read + Seek> TiffReader<R> {
      */
     fn read_offset(&mut self) -> Result<Offset, Error> {
         let offset: Offset = Offset::from(self.read_u32()?);
+        if offset % 2 == 1 {
+            return Err(Error::new(
+                InvalidData,
+                format!(
+                    "Value offset is odd and therefore not a word boundary: {}",
+                    offset
+                ),
+            ));
+        }
+        Ok(offset)
+    }
+
+    /// # Errors
+    ///
+    /// TODO add docs
+    // TODO test buffer has the right size
+    pub fn to_offset(&mut self, buffer: &[u8]) -> Result<Offset, Error> {
+        let offset: Offset = Offset::from(match self.endianness {
+            LittleEndian => {
+                (u32::from(buffer[3]) << 24)
+                    + (u32::from(buffer[2]) << 16)
+                    + (u32::from(buffer[1]) << 8)
+                    + u32::from(buffer[0])
+            }
+            BigEndian => {
+                (u32::from(buffer[0]) << 24)
+                    + (u32::from(buffer[1]) << 16)
+                    + (u32::from(buffer[2]) << 8)
+                    + u32::from(buffer[3])
+            }
+        });
         if offset % 2 == 1 {
             return Err(Error::new(
                 InvalidData,

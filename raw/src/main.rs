@@ -13,17 +13,32 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
+use data::Tag;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
-use tiff_reader::Ifd;
-use tiff_reader::TiffReader;
+use tiff_reader::{Ifd, Offset, TiffReader};
 
+// TODO process SubIFDs
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
         let mut tiff_reader: TiffReader<BufReader<File>> =
             TiffReader::new(BufReader::new(File::open(file_name)?))?;
         let ifds: Vec<Ifd> = tiff_reader.read()?;
+        if let Some(field) = ifds[0].fields.get(&Tag::SubIFDs) {
+            // TODO treat count > 1
+            let offset: Offset = tiff_reader.to_offset(&field.raw_data[0..4])?;
+            let ifd: Ifd = tiff_reader.process_ifd(offset)?;
+            for key in ifd.fields.keys() {
+                println!("{key:?}");
+                if let Some(field) = ifd.fields.get(key) {
+                    println!("\tType: {:?}", field.type_);
+                    println!("\tNumber of values: {}", field.count);
+                    println!("\tValue: {:?}", field.raw_data);
+                }
+            }
+        }
+        /*
         for ifd in ifds {
             for key in ifd.fields.keys() {
                 println!("{key:?}");
@@ -34,6 +49,7 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
+         */
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
