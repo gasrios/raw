@@ -13,21 +13,6 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
-use std::collections::HashMap;
-
-pub type Offset = u64;
-
-pub struct Ifd {
-    pub fields: HashMap<Tag, Field>,
-    pub offset: Offset,
-}
-
-pub struct Field {
-    pub type_: Type,
-    pub count: u32,
-    pub raw_data: Vec<u8>,
-}
-
 // TODO Tag and Type should be in separate modules and files
 
 /*

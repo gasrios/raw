@@ -13,10 +13,10 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
-use data::Ifd;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
+use tiff_reader::Ifd;
 use tiff_reader::TiffReader;
 
 fn main() -> Result<(), Error> {

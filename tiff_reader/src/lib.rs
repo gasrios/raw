@@ -13,10 +13,23 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
-use data::{Field, Ifd, Offset, Tag, Type};
+use data::{Tag, Type};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 use Endianness::{BigEndian, LittleEndian};
+
+pub type Offset = u64;
+
+pub struct Ifd {
+    pub fields: HashMap<Tag, Field>,
+    pub offset: Offset,
+}
+
+pub struct Field {
+    pub type_: Type,
+    pub count: u32,
+    pub raw_data: Vec<u8>,
+}
 
 enum Endianness {
     BigEndian,
