@@ -44,7 +44,28 @@ impl<R: Read + Seek> TiffReader<R> {
     /// # Errors
     ///
     /// TODO add docs
-    pub fn process_header(&mut self) -> Result<Offset, Error> {
+    pub fn read(&mut self) -> Result<Vec<Ifd>, Error> {
+        let mut offset: Offset = self.process_header()?;
+        let mut ifds: Vec<Ifd> = Vec::<Ifd>::new();
+        loop {
+            let ifd = self.process_ifd(offset)?;
+
+            /*
+             * From TIFF 6.0 Specification, page 14
+             *
+             * An Image File Directory (IFD) consists of (...) followed by a 4-byte offset of
+             * the next IFD (or 0 if none).
+             */
+            offset = ifd.offset;
+            ifds.push(ifd);
+            if offset == 0 {
+                break;
+            }
+        }
+        Ok(ifds)
+    }
+
+    fn process_header(&mut self) -> Result<Offset, Error> {
         /*
          * From TIFF 6.0 Specification, page 13
          *
@@ -63,7 +84,7 @@ impl<R: Read + Seek> TiffReader<R> {
          *            from most significant to least significant, for both 16-bit and 32-bit
          *            integers. This is called big-endian byte order.
          */
-        let buffer: [u8; 2] = self.read_in_stack()?;
+        let buffer: [u8; 2] = self.read_to_stack()?;
         if buffer[0] == 0x49 && buffer[1] == 0x49 {
             self.endianness = LittleEndian;
         } else if buffer[0] == 0x4D && buffer[1] == 0x4D {
@@ -122,14 +143,7 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(offset)
     }
 
-    /// # Errors
-    ///
-    /// TODO add docs
-    ///
-    /// # Panics
-    ///
-    /// TODO add docs
-    pub fn process_ifd(&mut self, offset: Offset) -> Result<Ifd, Error> {
+    fn process_ifd(&mut self, offset: Offset) -> Result<Ifd, Error> {
         self.reader.seek(SeekFrom::Start(offset))?;
         /*
          * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
@@ -150,7 +164,7 @@ impl<R: Read + Seek> TiffReader<R> {
          */
         let number_of_fields: u16 = self.read_u16()?;
 
-        let mut fields = HashMap::new();
+        let mut fields: HashMap<Tag, Field> = HashMap::<Tag, Field>::new();
         for _i in 0..number_of_fields {
             /*
              * IFD Entry
@@ -162,8 +176,8 @@ impl<R: Read + Seek> TiffReader<R> {
             let tag: Tag = self.read_tag()?;
 
             /*
-             * TODO we do not need to know or process all tags, uncomment this after testing is
-             * done
+             * TODO we do not need to know or process all tags, remove the ones we don't care about
+             * uncomment this after testing is done.
             if tag == Tag::Unknown {
                 break;
             }
@@ -224,10 +238,10 @@ impl<R: Read + Seek> TiffReader<R> {
                 let offset: Offset = self.read_offset()?;
                 let current_offset: Offset = self.reader.stream_position()?;
                 self.reader.seek(SeekFrom::Start(offset))?;
-                raw_data = self.read_in_heap(size)?;
+                raw_data = self.read_to_heap(size)?;
                 self.reader.seek(SeekFrom::Start(current_offset))?;
             } else {
-                raw_data = self.read_in_heap(size)?;
+                raw_data = self.read_to_heap(size)?;
                 self.reader
                     .seek(SeekFrom::Current((4 - size).try_into().unwrap()))?;
             }
@@ -275,7 +289,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_i16(&mut self) -> Result<i16, Error> {
-        let buffer: [u8; 2] = self.read_in_stack()?;
+        let buffer: [u8; 2] = self.read_to_stack()?;
         Ok(match self.endianness {
             LittleEndian => (i16::from(buffer[1]) << 8) + i16::from(buffer[0]),
             BigEndian => (i16::from(buffer[0]) << 8) + i16::from(buffer[1]),
@@ -283,7 +297,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_u16(&mut self) -> Result<u16, Error> {
-        let buffer: [u8; 2] = self.read_in_stack()?;
+        let buffer: [u8; 2] = self.read_to_stack()?;
         Ok(match self.endianness {
             LittleEndian => (u16::from(buffer[1]) << 8) + u16::from(buffer[0]),
             BigEndian => (u16::from(buffer[0]) << 8) + u16::from(buffer[1]),
@@ -291,7 +305,7 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn read_u32(&mut self) -> Result<u32, Error> {
-        let buffer: [u8; 4] = self.read_in_stack()?;
+        let buffer: [u8; 4] = self.read_to_stack()?;
         Ok(match self.endianness {
             LittleEndian => {
                 (u32::from(buffer[3]) << 24)
@@ -316,13 +330,13 @@ impl<R: Read + Seek> TiffReader<R> {
      * I'm keeping both for the time being, but may remove one in case it looks like it became
      * redundant and offers no benefit.
      */
-    fn read_in_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
+    fn read_to_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
         let mut buffer: [u8; SIZE] = [0u8; SIZE];
-        self.read(&mut buffer)?;
+        self.read_to(&mut buffer)?;
         Ok(buffer)
     }
 
-    fn read_in_heap(&mut self, size: usize) -> Result<Vec<u8>, Error> {
+    fn read_to_heap(&mut self, size: usize) -> Result<Vec<u8>, Error> {
         /*
          * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
          * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
@@ -335,11 +349,11 @@ impl<R: Read + Seek> TiffReader<R> {
         unsafe {
             buffer.set_len(size);
         }
-        self.read(&mut buffer)?;
+        self.read_to(&mut buffer)?;
         Ok(buffer)
     }
 
-    fn read(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
+    fn read_to(&mut self, buffer: &mut [u8]) -> Result<(), Error> {
         let bytes_read: usize = self.reader.read(buffer)?;
         if bytes_read != buffer.len() {
             return Err(Error::new(

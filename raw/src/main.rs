@@ -13,7 +13,7 @@
  * not, see http://www.gnu.org/licenses/.
  */
 
-use data::Offset;
+use data::Ifd;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
@@ -23,40 +23,19 @@ fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
         let mut tiff_reader: TiffReader<BufReader<File>> =
             TiffReader::new(BufReader::new(File::open(file_name)?))?;
-        {
-            /*
-             * TODO move this code block to tiff_reader::TiffReader, make if return a data
-             * structure
-             */
-            let mut offset: Offset = tiff_reader.process_header()?;
-            loop {
-                let ifd = tiff_reader.process_ifd(offset)?;
-
-                for key in ifd.fields.keys() {
-                    println!("Tag: {key:?}");
-                    if let Some(field) = ifd.fields.get(key) {
-                        println!("\tType: {:?}", field.type_);
-                        println!("\tNumber of values: {}", field.count);
-                        println!("\tValue: {:?}", field.raw_data);
-                    }
+        let ifds: Vec<Ifd> = tiff_reader.read()?;
+        for ifd in ifds {
+            for key in ifd.fields.keys() {
+                println!("{key:?}");
+                if let Some(field) = ifd.fields.get(key) {
+                    println!("\tType: {:?}", field.type_);
+                    println!("\tNumber of values: {}", field.count);
+                    println!("\tValue: {:?}", field.raw_data);
                 }
-
-                /*
-                 * From TIFF 6.0 Specification, page 14
-                 *
-                 * An Image File Directory (IFD) consists of (...) followed by a 4-byte offset of
-                 * the next IFD (or 0 if none).
-                 */
-                if ifd.offset == 0 {
-                    break;
-                }
-
-                offset = ifd.offset;
             }
         }
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
-
     Ok(())
 }
