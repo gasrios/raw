@@ -38,18 +38,6 @@ fn main() -> Result<(), Error> {
                 }
             }
         }
-        /*
-        for ifd in ifds {
-            for key in ifd.fields.keys() {
-                println!("{key:?}");
-                if let Some(field) = ifd.fields.get(key) {
-                    println!("\tType: {:?}", field.type_);
-                    println!("\tNumber of values: {}", field.count);
-                    println!("\tValue: {:?}", field.raw_data);
-                }
-            }
-        }
-         */
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
