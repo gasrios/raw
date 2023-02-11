@@ -85,7 +85,6 @@ impl<R: Read + Seek> TiffReader<R> {
     /// # Errors
     ///
     /// TODO add docs
-    // TODO return struct Dng
     pub fn read_dng(&mut self) -> Result<Dng, Error> {
         let offset: Offset = self.process_header()?;
 
@@ -145,10 +144,10 @@ impl<R: Read + Seek> TiffReader<R> {
             let ifd = self.process_ifd(offset)?;
 
             /*
-             * From TIFF 6.0 Specification, page 14
+             * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
              *
-             * An Image File Directory (IFD) consists of (...) followed by a 4-byte offset of
-             * the next IFD (or 0 if none).
+             * 𝐴𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 (𝐼𝐹𝐷) 𝑐𝑜𝑛𝑠𝑖𝑠𝑡𝑠 𝑜𝑓 (...) 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 4-𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 𝑡ℎ𝑒
+             * 𝑛𝑒𝑥𝑡 𝐼𝐹𝐷 (𝑜𝑟 0 𝑖𝑓 𝑛𝑜𝑛𝑒).
              */
             offset = ifd.offset;
             ifds.push(ifd);
@@ -161,22 +160,22 @@ impl<R: Read + Seek> TiffReader<R> {
 
     fn process_header(&mut self) -> Result<Offset, Error> {
         /*
-         * From TIFF 6.0 Specification, page 13
+         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
          *
-         * Image File Header
+         * 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐻𝑒𝑎𝑑𝑒𝑟
          *
-         * A TIFF file begins with an 8-byte image file header, containing the following
-         * information:
+         * 𝐴 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑏𝑒𝑔𝑖𝑛𝑠 𝑤𝑖𝑡ℎ 𝑎𝑛 8-𝑏𝑦𝑡𝑒 𝑖𝑚𝑎𝑔𝑒 𝑓𝑖𝑙𝑒 ℎ𝑒𝑎𝑑𝑒𝑟, 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔
+         * 𝑖𝑛𝑓𝑜𝑟𝑚𝑎𝑡𝑖𝑜𝑛:
          *
-         * Bytes 0-1: The byte order used within the file. Legal values are:
-         *            “II” (4949.H)
-         *            “MM” (4D4D.H)
+         * 𝐵𝑦𝑡𝑒𝑠 0-1: 𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑢𝑠𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒. 𝐿𝑒𝑔𝑎𝑙 𝑣𝑎𝑙𝑢𝑒𝑠 𝑎𝑟𝑒:
+         *            “𝐼𝐼” (4949.𝐻)
+         *            “𝑀𝑀” (4𝐷4𝐷.𝐻)
          *
-         *            In the “II” format, byte order is always from the least significant byte
-         *            to the most significant byte, for both 16-bit and 32-bit integers This is
-         *            called little-endian byte order. In the “MM” format, byte order is always
-         *            from most significant to least significant, for both 16-bit and 32-bit
-         *            integers. This is called big-endian byte order.
+         *            𝐼𝑛 𝑡ℎ𝑒 “𝐼𝐼” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒 𝑡𝑜
+         *            𝑡ℎ𝑒 𝑚𝑜𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠 𝑇ℎ𝑖𝑠 𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑
+         *            𝑙𝑖𝑡𝑡𝑙𝑒-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟. 𝐼𝑛 𝑡ℎ𝑒 “𝑀𝑀” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑚𝑜𝑠𝑡
+         *            𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑡𝑜 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠. 𝑇ℎ𝑖𝑠
+         *            𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑 𝑏𝑖𝑔-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟.
          */
         let buffer: [u8; 2] = self.read_to_stack()?;
         if buffer[0] == 0x49 && buffer[1] == 0x49 {
@@ -194,10 +193,10 @@ impl<R: Read + Seek> TiffReader<R> {
         }
 
         /*
-         * Bytes 2-3: An arbitrary but carefully chosen number (42) that further identifies the
-         *            file as a TIFF file.
+         * 𝐵𝑦𝑡𝑒𝑠 2-3: 𝐴𝑛 𝑎𝑟𝑏𝑖𝑡𝑟𝑎𝑟𝑦 𝑏𝑢𝑡 𝑐𝑎𝑟𝑒𝑓𝑢𝑙𝑙𝑦 𝑐ℎ𝑜𝑠𝑒𝑛 𝑛𝑢𝑚𝑏𝑒𝑟 (42) 𝑡ℎ𝑎𝑡 𝑓𝑢𝑟𝑡ℎ𝑒𝑟 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒
+         *            𝑓𝑖𝑙𝑒 𝑎𝑠 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒.
          *
-         *            The byte order depends on the value of Bytes 0-1.
+         *            𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑑𝑒𝑝𝑒𝑛𝑑𝑠 𝑜𝑛 𝑡ℎ𝑒 𝑣𝑎𝑙𝑢𝑒 𝑜𝑓 𝐵𝑦𝑡𝑒𝑠 0-1.
          */
         let version: i16 = self.read_i16()?;
         if version != 42 {
@@ -208,20 +207,21 @@ impl<R: Read + Seek> TiffReader<R> {
         }
 
         /*
-         * Bytes 4-7: The offset (in bytes) of the first IFD. The directory may be at any
-         *            location in the file after the header but must begin on a word boundary.
-         *            In particular, an Image File Directory may follow the image data it
-         *            describes. Readers must follow the pointers wherever they may lead.
+         * 𝐵𝑦𝑡𝑒𝑠 4-7: 𝑇ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
+         *            𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦. 𝐼𝑛
+         *            𝑝𝑎𝑟𝑡𝑖𝑐𝑢𝑙𝑎𝑟, 𝑎𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑖𝑚𝑎𝑔𝑒 𝑑𝑎𝑡𝑎 𝑖𝑡 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑠.
+         *            𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑚𝑢𝑠𝑡 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑤ℎ𝑒𝑟𝑒𝑣𝑒𝑟 𝑡ℎ𝑒𝑦 𝑚𝑎𝑦 𝑙𝑒𝑎𝑑.
          *
-         *            The term byte offset is always used in this document to refer to a
-         *            location with respect to the beginning of the TIFF file. The first byte
-         *            of the file has an offset of 0.
+         *            𝑇ℎ𝑒 𝑡𝑒𝑟𝑚 𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑢𝑠𝑒𝑑 𝑖𝑛 𝑡ℎ𝑖𝑠 𝑑𝑜𝑐𝑢𝑚𝑒𝑛𝑡 𝑡𝑜 𝑟𝑒𝑓𝑒𝑟 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
+         *            𝑤𝑖𝑡ℎ 𝑟𝑒𝑠𝑝𝑒𝑐𝑡 𝑡𝑜 𝑡ℎ𝑒 𝑏𝑒𝑔𝑖𝑛𝑛𝑖𝑛𝑔 𝑜𝑓 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒. 𝑇ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝑏𝑦𝑡𝑒 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒
+         *            ℎ𝑎𝑠 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 0.
          */
         let offset: Offset = self.read_offset()?;
 
         /*
-         * From TIFF 6.0 Specification, page 14: "There must be at least 1 IFD in a TIFF file and
-         * each IFD must have at least one entry."
+         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
+         *
+         * 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
          *
          * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the
          * file.
@@ -245,27 +245,27 @@ impl<R: Read + Seek> TiffReader<R> {
          */
 
         /*
-         * From TIFF 6.0 Specification, page 14
+         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
          *
-         * Image File Directory
+         * 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
          *
-         * An Image File Directory (IFD) consists of a 2-byte count of the number of directory
-         * entries (i.e., the number of fields), followed by a sequence of 12-byte field entries,
-         * followed by a 4-byte offset of the next IFD (or 0 if none). (Do not forget to write the
-         * 4 bytes of 0 after the last IFD.)
+         * 𝐴𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 (𝐼𝐹𝐷) 𝑐𝑜𝑛𝑠𝑖𝑠𝑡𝑠 𝑜𝑓 𝑎 2-𝑏𝑦𝑡𝑒 𝑐𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
+         * 𝑒𝑛𝑡𝑟𝑖𝑒𝑠 (𝑖.𝑒., 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑓𝑖𝑒𝑙𝑑𝑠), 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 𝑠𝑒𝑞𝑢𝑒𝑛𝑐𝑒 𝑜𝑓 12-𝑏𝑦𝑡𝑒 𝑓𝑖𝑒𝑙𝑑 𝑒𝑛𝑡𝑟𝑖𝑒𝑠,
+         * 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 4-𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑒𝑥𝑡 𝐼𝐹𝐷 (𝑜𝑟 0 𝑖𝑓 𝑛𝑜𝑛𝑒). (𝐷𝑜 𝑛𝑜𝑡 𝑓𝑜𝑟𝑔𝑒𝑡 𝑡𝑜 𝑤𝑟𝑖𝑡𝑒 𝑡ℎ𝑒
+         * 4 𝑏𝑦𝑡𝑒𝑠 𝑜𝑓 0 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 𝑙𝑎𝑠𝑡 𝐼𝐹𝐷.)
          *
-         * There must be at least 1 IFD in a TIFF file and each IFD must have at least one entry.
+         * 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
          */
         let number_of_fields: u16 = self.read_u16()?;
 
         let mut fields: HashMap<Tag, Field> = HashMap::<Tag, Field>::new();
         for _i in 0..number_of_fields {
             /*
-             * IFD Entry
+             * 𝐼𝐹𝐷 𝐸𝑛𝑡𝑟𝑦
              *
-             * Each 12-byte IFD entry has the following format:
+             * 𝐸𝑎𝑐ℎ 12-𝑏𝑦𝑡𝑒 𝐼𝐹𝐷 𝑒𝑛𝑡𝑟𝑦 ℎ𝑎𝑠 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔 𝑓𝑜𝑟𝑚𝑎𝑡:
              *
-             * Bytes 0-1 The Tag that identifies the field.
+             * 𝐵𝑦𝑡𝑒𝑠 0-1 𝑇ℎ𝑒 𝑇𝑎𝑔 𝑡ℎ𝑎𝑡 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
              */
             let tag: Tag = self.read_tag()?;
 
@@ -278,15 +278,15 @@ impl<R: Read + Seek> TiffReader<R> {
              */
 
             /*
-             * Bytes 2-3 The field Type.
+             * 𝐵𝑦𝑡𝑒𝑠 2-3 𝑇ℎ𝑒 𝑓𝑖𝑒𝑙𝑑 𝑇𝑦𝑝𝑒.
              */
             let type_: Type = self.read_type()?;
 
             /*
-             * From TIFF 6.0 Specification, page 14
+             * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
              *
-             * Warning: It is possible that other TIFF field types will be added in the future.
-             *          Readers should skip over fields containing an unexpected field type.
+             * 𝑊𝑎𝑟𝑛𝑖𝑛𝑔: 𝐼𝑡 𝑖𝑠 𝑝𝑜𝑠𝑠𝑖𝑏𝑙𝑒 𝑡ℎ𝑎𝑡 𝑜𝑡ℎ𝑒𝑟 𝑇𝐼𝐹𝐹 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒𝑠 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑎𝑑𝑑𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑢𝑡𝑢𝑟𝑒.
+             * 𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑠ℎ𝑜𝑢𝑙𝑑 𝑠𝑘𝑖𝑝 𝑜𝑣𝑒𝑟 𝑓𝑖𝑒𝑙𝑑𝑠 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑢𝑛𝑒𝑥𝑝𝑒𝑐𝑡𝑒𝑑 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒.
              */
             if type_ == Type::Unexpected {
                 break;
@@ -300,7 +300,7 @@ impl<R: Read + Seek> TiffReader<R> {
             }
 
             /*
-             * Bytes 4-7 The number of values, Count of the indicated Type.
+             * 𝐵𝑦𝑡𝑒𝑠 4-7 𝑇ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑣𝑎𝑙𝑢𝑒𝑠, 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑖𝑛𝑑𝑖𝑐𝑎𝑡𝑒𝑑 𝑇𝑦𝑝𝑒.
              */
             let count: u32 = self.read_u32()?;
 
@@ -315,18 +315,17 @@ impl<R: Read + Seek> TiffReader<R> {
             let size: usize = usize::try_from(count * type_.size()).unwrap();
 
             /*
-             * Bytes 8-11 The Value Offset, the file offset (in bytes) of the Value for the
-             * field.
+             * 𝐵𝑦𝑡𝑒𝑠 8-11 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑜𝑟 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
              *
-             * From TIFF 6.0 Specification, page 15
+             * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟓
              *
-             * Value/Offset
+             * 𝑉𝑎𝑙𝑢𝑒/𝑂𝑓𝑓𝑠𝑒𝑡
              *
-             * To save time and space the Value Offset contains the Value instead of pointing to
-             * the Value if and only if the Value fits into 4 bytes. If the Value is shorter than 4
-             * bytes, it is left-justified within the 4-byte Value Offset, i.e., stored in the
-             * lower-numbered bytes. Whether the Value fits within 4 bytes is determined by the
-             * Type and Count of the field.
+             * 𝑇𝑜 𝑠𝑎𝑣𝑒 𝑡𝑖𝑚𝑒 𝑎𝑛𝑑 𝑠𝑝𝑎𝑐𝑒 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑠 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑛𝑠𝑡𝑒𝑎𝑑 𝑜𝑓 𝑝𝑜𝑖𝑛𝑡𝑖𝑛𝑔 𝑡𝑜
+             * 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑓 𝑎𝑛𝑑 𝑜𝑛𝑙𝑦 𝑖𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑖𝑛𝑡𝑜 4 𝑏𝑦𝑡𝑒𝑠. 𝐼𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑠 𝑠ℎ𝑜𝑟𝑡𝑒𝑟 𝑡ℎ𝑎𝑛 4
+             * 𝑏𝑦𝑡𝑒𝑠, 𝑖𝑡 𝑖𝑠 𝑙𝑒𝑓𝑡-𝑗𝑢𝑠𝑡𝑖𝑓𝑖𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 4-𝑏𝑦𝑡𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑖.𝑒., 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒
+             * 𝑙𝑜𝑤𝑒𝑟-𝑛𝑢𝑚𝑏𝑒𝑟𝑒𝑑 𝑏𝑦𝑡𝑒𝑠. 𝑊ℎ𝑒𝑡ℎ𝑒𝑟 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑤𝑖𝑡ℎ𝑖𝑛 4 𝑏𝑦𝑡𝑒𝑠 𝑖𝑠 𝑑𝑒𝑡𝑒𝑟𝑚𝑖𝑛𝑒𝑑 𝑏𝑦 𝑡ℎ𝑒
+             * 𝑇𝑦𝑝𝑒 𝑎𝑛𝑑 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
              */
             if size > 4 {
                 let offset: Offset = self.read_offset()?;
@@ -355,10 +354,10 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     /*
-     * From TIFF 6.0 Specification, page 13
+     * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
      *
-     * The directory may be at any location in the file after the header but must begin on
-     * a word boundary.
+     * 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑
+     * 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦.
      */
     fn read_offset(&mut self) -> Result<Offset, Error> {
         let offset: Offset = Offset::from(self.read_u32()?);
