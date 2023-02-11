@@ -1,14 +1,12 @@
 # raw
 
-This is **not** a production ready raw reader, just a personal project I started while studying digital image processing. The [first version](https://github.com/raw-tiff) was written in Java, then migrated to [Rust](https://www.rust-lang.org/) because, you guessed it, I am now studying Rust.
+[Raw image format](https://en.wikipedia.org/wiki/Raw_image_format) processor. This is **not** a production ready raw reader, just a personal project I started while studying digital photography editing. The [first version](https://github.com/raw-tiff) was written in Java, then migrated to [Rust](https://www.rust-lang.org/) because, you guessed it, I am now studying Rust.
 
 If you need a complete, fully functional library, check [dcraw](https://www.cybercom.net/~dcoffin/dcraw/) out.
 
-Currently the only format supported is uncompressed, linear (demosaiced) [Adobe Digital Negative (DNG)](https://helpx.adobe.com/camera-raw/digital-negative.html). Reading TIFF metadata is also supported.
+Currently the only format supported is [linear](https://en.wikipedia.org/wiki/Demosaicing) and uncompressed [Adobe Digital Negative (DNG)](https://helpx.adobe.com/camera-raw/digital-negative.html). I decided to support DNG first because, unlike other formats such as Canon's CR2 or Nikon's .NEF, DNG has a specification publicly available. Also, virtually all widely used raw formats are TIFF-based, like DNG, so if you can read it, you are more than halfway done reading the others, too.
 
-I decided to support DNG first because, unlike other formats such as Canon's CR2 or Nikon's .NEF, DNG has a specification publicly available. Also, virtually all widely used raw formats are TIFF-based, like DNG, so if you can read it, you are more than halfway done reading any raw file format.
-
-You can use [Adobe Digital Negative Converter](https://helpx.adobe.com/camera-raw/using/adobe-dng-converter.html) to convert other raw formats to DNG.
+You can use [Adobe Digital Negative Converter](https://helpx.adobe.com/camera-raw/using/adobe-dng-converter.html) to convert other raw formats to DNG. To generate files that can be processed by raw, use command line options `-l` and `-u`.
 
 ## Before you begin
 
