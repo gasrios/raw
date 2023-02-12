@@ -225,7 +225,6 @@ impl<R: Read + Seek> TiffReader<R> {
          *
          * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the
          * file.
-         *
          */
         if offset < 8 {
             return Err(Error::new(

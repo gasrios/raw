@@ -186,6 +186,32 @@ impl Tag {
             50709 => Tag::LocalizedCameraModel,
 
             /*
+             * Digital Negative Specification, Version 1.4.0.0,  page 27
+             * See chapter 5, “Mapping Raw Values to Linear Reference Values” on page 77 for
+             * details of the processing model.
+             */
+            50714 => Tag::BlackLevel,
+
+            /*
+             * Digital Negative Specification, Version 1.4.0.0,  page 29
+             * See chapter 5, “Mapping Raw Values to Linear Reference Values” on page 77 for
+             * details of the processing model.
+             */
+            50717 => Tag::WhiteLevel,
+
+            // Digital Negative Specification, Version 1.4.0.0,  page 29
+            50718 => Tag::DefaultScale,
+
+            // Digital Negative Specification, Version 1.4.0.0,  page 30
+            50719 => Tag::DefaultCropOrigin,
+
+            /*
+             * Digital Negative Specification, Version 1.4.0.0,  page 31
+             * http://www.barrypearson.co.uk/articles/dng/specification.htm
+             */
+            50720 => Tag::DefaultCropSize,
+
+            /*
              * Digital Negative Specification, Version 1.4.0.0, page 32
              *
              * See chapter 6, “Mapping Camera Color Space to CIE XYZ Space” on page 79 for details
@@ -252,6 +278,9 @@ impl Tag {
             50736 => Tag::LensInfo,
 
             // Digital Negative Specification, Version 1.4.0.0, page 42
+            50738 => Tag::AntiAliasStrength,
+
+            // Digital Negative Specification, Version 1.4.0.0, page 42
             50739 => Tag::ShadowScale,
 
             // Digital Negative Specification, Version 1.4.0.0, page 43
@@ -276,6 +305,9 @@ impl Tag {
              * Exif, page 55
              */
             50779 => Tag::CalibrationIlluminant2,
+
+            // Digital Negative Specification, Version 1.4.0.0,  page 30
+            50780 => Tag::BestQualityScale,
 
             // Digital Negative Specification, Version 1.4.0.0, page 45
             50781 => Tag::RawDataUniqueID,
@@ -327,6 +359,17 @@ impl Tag {
 }
 
 #[derive(Debug, Eq, Hash, PartialEq)]
+/*
+ * TODO
+ *
+ * Unknown tag: 50714
+ * Unknown tag: 50717
+ * Unknown tag: 50718
+ * Unknown tag: 50719
+ * Unknown tag: 50720
+ * Unknown tag: 50738
+ * Unknown tag: 50780
+ */
 pub enum Tag {
     Unknown,
     NewSubFileType,
@@ -355,6 +398,13 @@ pub enum Tag {
     DNGBackwardVersion,
     UniqueCameraModel,
     LocalizedCameraModel,
+
+    BlackLevel,
+    WhiteLevel,
+    DefaultScale,
+    DefaultCropOrigin,
+    DefaultCropSize,
+
     ColorMatrix1,
     ColorMatrix2,
     CameraCalibration1,
@@ -368,10 +418,16 @@ pub enum Tag {
     LinearResponseLimit,
     CameraSerialNumber,
     LensInfo,
+
+    AntiAliasStrength,
+
     ShadowScale,
     DNGPrivateData,
     CalibrationIlluminant1,
     CalibrationIlluminant2,
+
+    BestQualityScale,
+
     RawDataUniqueID,
     OriginalRawFileName,
     CameraCalibrationSignature,
