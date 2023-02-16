@@ -70,7 +70,7 @@ pub struct TiffReader<R> {
 impl<R: Read + Seek> TiffReader<R> {
     /// # Errors
     ///
-    /// TODO add docs
+    /// Only those caused by the underlying reader
     pub fn new(reader: R) -> Result<TiffReader<R>, Error> {
         Ok(TiffReader {
             reader,
@@ -82,10 +82,11 @@ impl<R: Read + Seek> TiffReader<R> {
 
     /// # Panics
     ///
-    /// TODO add docs
+    /// Only when underlying reader panics
+    ///
     /// # Errors
     ///
-    /// TODO add docs
+    /// Only those caused by the underlying reader, plus nonconformance to DNG 1.4.0.0
     pub fn read_dng(&mut self) -> Result<Dng, Error> {
         let offset: Offset = self.process_header()?;
 
@@ -137,7 +138,7 @@ impl<R: Read + Seek> TiffReader<R> {
 
     /// # Errors
     ///
-    /// TODO add docs
+    /// Only those caused by the underlying reader, plus nonconformance to DNG 1.4.0.0
     pub fn read(&mut self) -> Result<Vec<Ifd>, Error> {
         let mut offset: Offset = self.process_header()?;
         let mut ifds: Vec<Ifd> = Vec::<Ifd>::new();
