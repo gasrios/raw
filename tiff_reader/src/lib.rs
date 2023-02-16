@@ -13,7 +13,8 @@
  * 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
  */
 
-use data::{Tag, Type};
+use data::tag::Tag;
+use data::type_::Type;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 use Endianness::{BigEndian, LittleEndian};
@@ -363,10 +364,7 @@ impl<R: Read + Seek> TiffReader<R> {
         if offset % 2 == 1 {
             return Err(Error::new(
                 InvalidData,
-                format!(
-                    "Value offset is odd and therefore not a word boundary: {}",
-                    offset
-                ),
+                format!("Value offset is odd and therefore not a word boundary: {offset}"),
             ));
         }
         Ok(offset)
@@ -390,10 +388,7 @@ impl<R: Read + Seek> TiffReader<R> {
         if offset % 2 == 1 {
             return Err(Error::new(
                 InvalidData,
-                format!(
-                    "Value offset is odd and therefore not a word boundary: {}",
-                    offset
-                ),
+                format!("Value offset is odd and therefore not a word boundary: {offset}"),
             ));
         }
         Ok(offset)
