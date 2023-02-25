@@ -14,7 +14,7 @@
  */
 
 use data::tag::Tag;
-use data::type_::Type;
+use data::type_::{Byte, Type};
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind::InvalidData, ErrorKind::UnexpectedEof, Read, Seek, SeekFrom};
 use Endianness::{BigEndian, LittleEndian};
@@ -54,17 +54,19 @@ pub struct Ifd {
 pub struct Field {
     pub type_: Type,
     pub count: u32,
+    pub endianness: Endianness,
     pub raw_data: Vec<u8>,
-}
-
-enum Endianness {
-    BigEndian,
-    LittleEndian,
 }
 
 pub struct TiffReader<R> {
     reader: R,
     endianness: Endianness,
+}
+
+#[derive(Clone, Copy)]
+pub enum Endianness {
+    BigEndian,
+    LittleEndian,
 }
 
 impl<R: Read + Seek> TiffReader<R> {
@@ -343,6 +345,7 @@ impl<R: Read + Seek> TiffReader<R> {
             let field: Field = Field {
                 type_,
                 count,
+                endianness: self.endianness,
                 raw_data,
             };
             fields.insert(tag, field);
@@ -480,5 +483,126 @@ impl<R: Read + Seek> TiffReader<R> {
             ));
         }
         Ok(())
+    }
+}
+
+pub fn to_byte(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_ascii(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_short(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_long(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_rational(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_sbyte(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_sshort(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_slong(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_srational(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_float(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
+    }
+}
+
+pub fn to_double(field: &Field) {
+    let mut buffer: Vec<Byte> = Vec::<Byte>::new();
+    for byte in &*field.raw_data {
+        buffer.push(*byte);
+    }
+    match field.endianness {
+        LittleEndian => (),
+        BigEndian => println!("BigEndian"),
     }
 }

@@ -13,10 +13,11 @@
  * 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
  */
 
+use data::type_::Type;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
-use tiff_reader::{Dng, TiffReader};
+use tiff_reader::{Dng, Field, TiffReader};
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
@@ -24,23 +25,40 @@ fn main() -> Result<(), Error> {
             TiffReader::new(BufReader::new(File::open(file_name)?))?;
         let dng: Dng = tiff_reader.read_dng()?;
         for key in dng.ifd0.fields.keys() {
-            println!("ifd0.{key:?}");
             if let Some(field) = dng.ifd0.fields.get(key) {
-                println!("\tType: {:?}", field.type_);
-                println!("\tNumber of values: {}", field.count);
-                println!("\tValue: {:?}", field.raw_data);
+                println!("ifd0.{key:?}");
+                print_field(field);
             }
         }
         for key in dng.hires_ifd.fields.keys() {
-            println!("hires_ifd.{key:?}");
             if let Some(field) = dng.hires_ifd.fields.get(key) {
-                println!("\tType: {:?}", field.type_);
-                println!("\tNumber of values: {}", field.count);
-                println!("\tValue: {:?}", field.raw_data);
+                println!("hires_ifd.{key:?}");
+                print_field(field);
             }
         }
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
     Ok(())
+}
+
+pub fn print_field(field: &Field) {
+    println!("\tType: {:?}", field.type_);
+    println!("\tNumber of values: {}", field.count);
+    println!("\tValue: {:?}", field.raw_data);
+    match field.type_ {
+        Type::Byte(_size) => tiff_reader::to_byte(field),
+        Type::Ascii(_size) => tiff_reader::to_ascii(field),
+        Type::Short(_size) => tiff_reader::to_short(field),
+        Type::Long(_size) => tiff_reader::to_long(field),
+        Type::Rational(_size) => tiff_reader::to_rational(field),
+        Type::Sbyte(_size) => tiff_reader::to_sbyte(field),
+        Type::Undefined(_size) => tiff_reader::to_byte(field),
+        Type::Sshort(_size) => tiff_reader::to_sshort(field),
+        Type::Slong(_size) => tiff_reader::to_slong(field),
+        Type::Srational(_size) => tiff_reader::to_srational(field),
+        Type::Float(_size) => tiff_reader::to_float(field),
+        Type::Double(_size) => tiff_reader::to_double(field),
+        _ => (),
+    }
 }
