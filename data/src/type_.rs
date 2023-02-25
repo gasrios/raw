@@ -38,6 +38,20 @@
  * 𝑊𝑎𝑟𝑛𝑖𝑛𝑔: 𝐼𝑡 𝑖𝑠 𝑝𝑜𝑠𝑠𝑖𝑏𝑙𝑒 𝑡ℎ𝑎𝑡 𝑜𝑡ℎ𝑒𝑟 𝑇𝐼𝐹𝐹 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒𝑠 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑎𝑑𝑑𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑢𝑡𝑢𝑟𝑒. 𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑠ℎ𝑜𝑢𝑙𝑑
  *          𝑠𝑘𝑖𝑝 𝑜𝑣𝑒𝑟 𝑓𝑖𝑒𝑙𝑑𝑠 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑢𝑛𝑒𝑥𝑝𝑒𝑐𝑡𝑒𝑑 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒.
  */
+
+pub type Byte = u8;
+pub type Ascii = char;
+pub type Short = u16;
+pub type Long = u32;
+// TODO pub type Rational = ;
+pub type Sbyte = i8;
+pub type Undefined = u8;
+pub type Sshort = i16;
+pub type Slong = i32;
+// TODO pub type Srational = ;
+pub type Float = f32;
+pub type Double = f64;
+
 impl Type {
     #[must_use]
     pub const fn new(type_: u16) -> Type {
