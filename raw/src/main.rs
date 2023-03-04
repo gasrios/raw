@@ -13,7 +13,6 @@
  * 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
  */
 
-use data::type_::Type;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
@@ -26,16 +25,19 @@ fn main() -> Result<(), Error> {
         let dng: Dng = tiff_reader.read_dng()?;
         for key in dng.ifd0.fields.keys() {
             if let Some(field) = dng.ifd0.fields.get(key) {
-                println!("ifd0.{key:?}");
+                println!("Tag: ifd0.{key:?}");
                 print_field(field);
             }
         }
+        // TODO
+        /*
         for key in dng.hires_ifd.fields.keys() {
             if let Some(field) = dng.hires_ifd.fields.get(key) {
                 println!("hires_ifd.{key:?}");
                 print_field(field);
             }
         }
+         */
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
@@ -43,22 +45,15 @@ fn main() -> Result<(), Error> {
 }
 
 pub fn print_field(field: &Field) {
-    println!("\tType: {:?}", field.type_);
-    println!("\tNumber of values: {}", field.count);
-    println!("\tValue: {:?}", field.raw_data);
-    match field.type_ {
-        Type::Byte(_size) => tiff_reader::to_byte(field),
-        Type::Ascii(_size) => tiff_reader::to_ascii(field),
-        Type::Short(_size) => tiff_reader::to_short(field),
-        Type::Long(_size) => tiff_reader::to_long(field),
-        Type::Rational(_size) => tiff_reader::to_rational(field),
-        Type::Sbyte(_size) => tiff_reader::to_sbyte(field),
-        Type::Undefined(_size) => tiff_reader::to_byte(field),
-        Type::Sshort(_size) => tiff_reader::to_sshort(field),
-        Type::Slong(_size) => tiff_reader::to_slong(field),
-        Type::Srational(_size) => tiff_reader::to_srational(field),
-        Type::Float(_size) => tiff_reader::to_float(field),
-        Type::Double(_size) => tiff_reader::to_double(field),
-        _ => (),
+    match field {
+        Field::Byte(data) | Field::Undefined(data) => println!("Field value: {data:?}"),
+        Field::Ascii(data) => println!("Field value: {data:?}"),
+        Field::Short(data) => println!("Field value: {data:?}"),
+        Field::Long(data) => println!("Field value: {data:?}"),
+        Field::Sbyte(data) => println!("Field value: {data:?}"),
+        Field::Sshort(data) => println!("Field value: {data:?}"),
+        Field::Slong(data) => println!("Field value: {data:?}"),
+        Field::Float(data) => println!("Field value: {data:?}"),
+        Field::Double(data) => println!("Field value: {data:?}"),
     }
 }
