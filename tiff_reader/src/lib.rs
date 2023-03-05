@@ -42,7 +42,7 @@ use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
  */
 pub struct Dng {
     pub ifd0: Ifd,
-    // TODO pub hires_ifd: Ifd,
+    pub hires_ifd: Ifd,
 }
 
 pub struct Ifd {
@@ -94,7 +94,7 @@ impl<R: Read + Seek> TiffReader<R> {
     ///
     /// # Errors
     ///
-    /// Only those caused by the underlying reader, plus nonconformance to DNG 1.4.0.0
+    /// Those caused by the underlying reader, plus nonconformance to DNG 1.4.0.0
     pub fn read_dng(&mut self) -> Result<Dng, Error> {
         let offset: u64 = self.process_header()?;
 
@@ -113,39 +113,44 @@ impl<R: Read + Seek> TiffReader<R> {
             ));
         }
 
-        // TODO ...
-        Ok(Dng { ifd0 })
-        /*
         if let Some(field) = ifd0.fields.get(&Tag::SubIFDs) {
-            if usize::try_from(field.count * field.type_.size()).unwrap() > 4 {
-                /*
-                 * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟐
-                 *
-                 * 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑡ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑡ℎ𝑒 “𝑡𝑟𝑒𝑒𝑑” 𝐼𝐹𝐷 𝑖𝑡𝑠𝑒𝑙𝑓 𝑖𝑓 𝑁=1, 𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒 𝑡ℎ𝑒
-                 * 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑡𝑜 𝑒𝑎𝑐ℎ
-                 * 𝐼𝐹𝐷 𝑏𝑒𝑖𝑛𝑔 “𝑡𝑟𝑒𝑒𝑑” 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑐𝑢𝑟𝑟𝑒𝑛𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑖𝑠 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑁
-                 * 𝑒𝑛𝑡𝑟𝑖𝑒𝑠, 𝑖.𝑒. 𝑜𝑓𝑓𝑠𝑒𝑡 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑡𝑜 𝑁 𝐼𝐹𝐷𝑠. 𝑪𝒖𝒓𝒓𝒆𝒏𝒕𝒍𝒚, 𝑵=1, 𝒂𝒏𝒅 𝒕𝒉𝒆 𝑽𝒂𝒍𝒖𝒆 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒔
-                 * 𝒕𝒉𝒆 𝒐𝒇𝒇𝒔𝒆𝒕 𝒕𝒐 𝒕𝒉𝒆 𝑰𝑭𝑫 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒊𝒏𝒈 𝒕𝒉𝒆 𝒇𝒖𝒍𝒍 𝒓𝒆𝒔𝒐𝒍𝒖𝒕𝒊𝒐𝒏 𝒊𝒎𝒂𝒈𝒆.
-                 *
-                 * 𝑈𝑠𝑎𝑔𝑒: 𝐼𝐹𝐷0
-                 */
-                return Err(Error::new(
-                    InvalidData,
-                    "\"SubIFDs\" should only contain the offset to the IFD containing the full resolution image.",
-                ));
+            if let Field::Long(sub_ifds) = field {
+                if sub_ifds.len() != 1 {
+                    /*
+                     * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟐
+                     *
+                     * 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑡ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑡ℎ𝑒 “𝑡𝑟𝑒𝑒𝑑” 𝐼𝐹𝐷 𝑖𝑡𝑠𝑒𝑙𝑓 𝑖𝑓 𝑁=1, 𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒 𝑡ℎ𝑒
+                     * 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑡𝑜 𝑒𝑎𝑐ℎ
+                     * 𝐼𝐹𝐷 𝑏𝑒𝑖𝑛𝑔 “𝑡𝑟𝑒𝑒𝑑” 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑐𝑢𝑟𝑟𝑒𝑛𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑖𝑠 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑁
+                     * 𝑒𝑛𝑡𝑟𝑖𝑒𝑠, 𝑖.𝑒. 𝑜𝑓𝑓𝑠𝑒𝑡 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑡𝑜 𝑁 𝐼𝐹𝐷𝑠. 𝑪𝒖𝒓𝒓𝒆𝒏𝒕𝒍𝒚, 𝑵=1, 𝒂𝒏𝒅 𝒕𝒉𝒆 𝑽𝒂𝒍𝒖𝒆 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒔
+                     * 𝒕𝒉𝒆 𝒐𝒇𝒇𝒔𝒆𝒕 𝒕𝒐 𝒕𝒉𝒆 𝑰𝑭𝑫 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒊𝒏𝒈 𝒕𝒉𝒆 𝒇𝒖𝒍𝒍 𝒓𝒆𝒔𝒐𝒍𝒖𝒕𝒊𝒐𝒏 𝒊𝒎𝒂𝒈𝒆.
+                     *
+                     * 𝑈𝑠𝑎𝑔𝑒: 𝐼𝐹𝐷0
+                     */
+                    return Err(Error::new(
+                        ErrorKind::InvalidData,
+                        "\"SubIFDs\" should only contain the offset to the IFD containing the full resolution image.",
+                    ));
+                }
+
+                let offset: u64 = u64::from(sub_ifds[0]);
+
+                Ok(Dng {
+                    ifd0,
+                    hires_ifd: self.process_ifd(offset)?,
+                })
+            } else {
+                Err(Error::new(
+                    ErrorKind::InvalidData,
+                    "\"SubIFDs\" should have type \"long\".",
+                ))
             }
-            let offset: u64 = self.offset(&field.raw_data[0..4])?;
-            Ok(Dng {
-                ifd0,
-                hires_ifd: self.process_ifd(offset)?,
-            })
         } else {
             Err(Error::new(
-                InvalidData,
+                ErrorKind::InvalidData,
                 "TIFF/EP recommends that a thumbnail image be stored in the 0th IFD",
             ))
         }
-        */
     }
 
     fn process_header(&mut self) -> Result<u64, Error> {
@@ -359,11 +364,11 @@ impl<R: Read + Seek> TiffReader<R> {
             ASCII => to_ascii_field(&buffer),
             SHORT => self.to_short_field(&buffer)?,
             LONG => self.to_long_field(&buffer)?,
-            SBYTE => self.to_sbyte(&buffer)?,
-            SSHORT => self.to_sshort(&buffer)?,
-            SLONG => self.to_slong(&buffer)?,
-            FLOAT => self.to_float(&buffer)?,
-            DOUBLE => self.to_double(&buffer)?,
+            SBYTE => self.to_sbyte_field(&buffer)?,
+            SSHORT => self.to_sshort_field(&buffer)?,
+            SLONG => self.to_slong_field(&buffer)?,
+            FLOAT => self.to_float_field(&buffer)?,
+            DOUBLE => self.to_double_field(&buffer)?,
             // Covers BYTE and UNDEFINED
             _ => Field::Byte(buffer),
         })
@@ -391,8 +396,8 @@ impl<R: Read + Seek> TiffReader<R> {
     fn read_u16(&mut self) -> Result<u16, Error> {
         let buffer: [u8; 2] = self.read_to_stack()?;
         Ok(match self.endianness {
-            Endianness::LittleEndian => (u16::from(buffer[1]) << 8) + u16::from(buffer[0]),
-            Endianness::BigEndian => (u16::from(buffer[0]) << 8) + u16::from(buffer[1]),
+            Endianness::LittleEndian => u16::from_le_bytes(buffer),
+            Endianness::BigEndian => u16::from_be_bytes(buffer),
             Endianness::Uninitialized => {
                 return Err(Error::new(
                     ErrorKind::Other,
@@ -405,18 +410,8 @@ impl<R: Read + Seek> TiffReader<R> {
     fn read_u32(&mut self) -> Result<u32, Error> {
         let buffer: [u8; 4] = self.read_to_stack()?;
         Ok(match self.endianness {
-            Endianness::LittleEndian => {
-                (u32::from(buffer[3]) << 24)
-                    + (u32::from(buffer[2]) << 16)
-                    + (u32::from(buffer[1]) << 8)
-                    + u32::from(buffer[0])
-            }
-            Endianness::BigEndian => {
-                (u32::from(buffer[0]) << 24)
-                    + (u32::from(buffer[1]) << 16)
-                    + (u32::from(buffer[2]) << 8)
-                    + u32::from(buffer[3])
-            }
+            Endianness::LittleEndian => u32::from_le_bytes(buffer),
+            Endianness::BigEndian => u32::from_be_bytes(buffer),
             Endianness::Uninitialized => {
                 return Err(Error::new(
                     ErrorKind::Other,
@@ -452,9 +447,6 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(())
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a short from the given byte array
     fn to_short_field(&self, buffer: &[u8]) -> Result<Field, Error> {
         let size: usize = type_size(SHORT);
 
@@ -466,9 +458,15 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn to_short(&self, buffer: &[u8]) -> Result<Short, Error> {
+        if buffer.len() != 2 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for short: {}", buffer.len()),
+            ));
+        }
         Ok(match self.endianness {
-            Endianness::LittleEndian => (Short::from(buffer[1]) << 8) + Short::from(buffer[0]),
-            Endianness::BigEndian => (Short::from(buffer[0]) << 8) + Short::from(buffer[1]),
+            Endianness::LittleEndian => Short::from_le_bytes([buffer[0], buffer[1]]),
+            Endianness::BigEndian => Short::from_be_bytes([buffer[0], buffer[1]]),
             Endianness::Uninitialized => {
                 return Err(Error::new(
                     ErrorKind::Other,
@@ -478,9 +476,6 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a long from the given byte array
     fn to_long_field(&self, buffer: &[u8]) -> Result<Field, Error> {
         let size: usize = type_size(LONG);
 
@@ -491,22 +486,19 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(Field::Long(data))
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a long from the given byte array
     fn to_long(&self, buffer: &[u8]) -> Result<Long, Error> {
+        if buffer.len() != 4 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for long: {}", buffer.len()),
+            ));
+        }
         Ok(match self.endianness {
             Endianness::LittleEndian => {
-                (Long::from(buffer[3]) << 24)
-                    + (u32::from(buffer[2]) << 16)
-                    + (u32::from(buffer[1]) << 8)
-                    + u32::from(buffer[0])
+                Long::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
             }
             Endianness::BigEndian => {
-                (Long::from(buffer[0]) << 24)
-                    + (u32::from(buffer[1]) << 16)
-                    + (u32::from(buffer[2]) << 8)
-                    + u32::from(buffer[3])
+                Long::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
             }
             Endianness::Uninitialized => {
                 return Err(Error::new(
@@ -517,79 +509,166 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a sbyte from the given byte array
-    fn to_sbyte(&self, buffer: &[u8]) -> Result<Field, Error> {
-        if let Endianness::Uninitialized = self.endianness {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "TiffReader was not initialized correctly before read attempt",
-            ));
-        };
-        Ok(Field::Byte(buffer.to_vec()))
+    fn to_sbyte_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SBYTE);
+
+        let mut data: Vec<Sbyte> = Vec::<Sbyte>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_sbyte(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Sbyte(data))
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a sshort from the given byte array
-    fn to_sshort(&self, buffer: &[u8]) -> Result<Field, Error> {
-        if let Endianness::Uninitialized = self.endianness {
+    fn to_sbyte(&self, buffer: &[u8]) -> Result<Sbyte, Error> {
+        if buffer.len() != 1 {
             return Err(Error::new(
                 ErrorKind::Other,
-                "TiffReader was not initialized correctly before read attempt",
+                format!("Wrong array size for sbyte: {}", buffer.len()),
             ));
-        };
-        Ok(Field::Byte(buffer.to_vec()))
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Sbyte::from_le_bytes([buffer[0]]),
+            Endianness::BigEndian => Sbyte::from_be_bytes([buffer[0]]),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a slong from the given byte array
-    fn to_slong(&self, buffer: &[u8]) -> Result<Field, Error> {
-        if let Endianness::Uninitialized = self.endianness {
-            return Err(Error::new(
-                ErrorKind::Other,
-                "TiffReader was not initialized correctly before read attempt",
-            ));
-        };
-        Ok(Field::Byte(buffer.to_vec()))
+    fn to_sshort_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SSHORT);
+
+        let mut data: Vec<Sshort> = Vec::<Sshort>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_sshort(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Sshort(data))
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a foat from the given byte array
-    fn to_float(&self, buffer: &[u8]) -> Result<Field, Error> {
-        if let Endianness::Uninitialized = self.endianness {
+    fn to_sshort(&self, buffer: &[u8]) -> Result<Sshort, Error> {
+        if buffer.len() != 2 {
             return Err(Error::new(
                 ErrorKind::Other,
-                "TiffReader was not initialized correctly before read attempt",
+                format!("Wrong array size for sshort: {}", buffer.len()),
             ));
-        };
-        Ok(Field::Byte(buffer.to_vec()))
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Sshort::from_le_bytes([buffer[0], buffer[1]]),
+            Endianness::BigEndian => Sshort::from_be_bytes([buffer[0], buffer[1]]),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
     }
 
-    /// # Errors
-    ///
-    /// iff we can't generate a double from the given byte array
-    fn to_double(&self, buffer: &[u8]) -> Result<Field, Error> {
-        if let Endianness::Uninitialized = self.endianness {
+    fn to_slong_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SLONG);
+
+        let mut data: Vec<Slong> = Vec::<Slong>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_slong(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Slong(data))
+    }
+
+    fn to_slong(&self, buffer: &[u8]) -> Result<Slong, Error> {
+        if buffer.len() != 4 {
             return Err(Error::new(
                 ErrorKind::Other,
-                "TiffReader was not initialized correctly before read attempt",
+                format!("Wrong array size for slong: {}", buffer.len()),
             ));
-        };
-        Ok(Field::Byte(buffer.to_vec()))
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => {
+                Slong::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::BigEndian => {
+                Slong::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_float_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(FLOAT);
+
+        let mut data: Vec<Float> = Vec::<Float>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_float(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Float(data))
+    }
+
+    fn to_float(&self, buffer: &[u8]) -> Result<Float, Error> {
+        if buffer.len() != 4 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for float: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => {
+                Float::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::BigEndian => {
+                Float::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_double_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(DOUBLE);
+
+        let mut data: Vec<Double> = Vec::<Double>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_double(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Double(data))
+    }
+
+    fn to_double(&self, buffer: &[u8]) -> Result<Double, Error> {
+        if buffer.len() != 8 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for float: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Double::from_le_bytes([
+                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
+                buffer[7],
+            ]),
+            Endianness::BigEndian => Double::from_be_bytes([
+                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
+                buffer[7],
+            ]),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
     }
 }
 
-/// # Errors
-///
-/// iff we can't generate a string from the given byte array
-///
-/// # Panics
-///
-/// iff `String::from_utf8()` panics
 fn to_ascii_field(buffer: &[u8]) -> Field {
     let mut lenght: usize = buffer.len();
 

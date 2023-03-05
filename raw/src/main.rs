@@ -13,6 +13,7 @@
  * 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
  */
 
+//use data::Tag;
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
@@ -23,21 +24,22 @@ fn main() -> Result<(), Error> {
         let mut tiff_reader: TiffReader<BufReader<File>> =
             TiffReader::new(BufReader::new(File::open(file_name)?))?;
         let dng: Dng = tiff_reader.read_dng()?;
+
+        println!("ifd0");
         for tag in dng.ifd0.fields.keys() {
             dbg!(tag);
             if let Some(field) = dng.ifd0.fields.get(tag) {
                 dbg!(field);
             }
         }
-        // TODO
-        /*
-        for key in dng.hires_ifd.fields.keys() {
-            if let Some(field) = dng.hires_ifd.fields.get(key) {
-                println!("hires_ifd.{key:?}");
-                print_field(field);
+
+        println!("hires_ifd");
+        for tag in dng.hires_ifd.fields.keys() {
+            dbg!(tag);
+            if let Some(field) = dng.hires_ifd.fields.get(tag) {
+                dbg!(field);
             }
         }
-         */
     } else {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }

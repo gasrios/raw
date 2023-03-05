@@ -55,7 +55,6 @@ pub const FLOAT: u16 = 11;
 pub const DOUBLE: u16 = 12;
 
 pub type Byte = u8;
-// TODO pub type Ascii = char;
 pub type Short = u16;
 pub type Long = u32;
 // TODO pub type Rational = ;
