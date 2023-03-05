@@ -71,7 +71,7 @@ pub type Double = f64;
 ///
 /// If the number is not a valid type in TIFF
 #[must_use]
-pub fn type_size(type_: u16) -> u32 {
+pub fn type_size(type_: u16) -> usize {
     match type_ {
         ASCII | BYTE | SBYTE | UNDEFINED => 1,
         SHORT | SSHORT => 2,

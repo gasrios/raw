@@ -16,17 +16,17 @@
 use std::env::args;
 use std::fs::File;
 use std::io::{BufReader, Error, ErrorKind::InvalidData};
-use tiff_reader::{Dng, Field, TiffReader};
+use tiff_reader::{Dng, TiffReader};
 
 fn main() -> Result<(), Error> {
     if let Some(file_name) = args().nth(1) {
         let mut tiff_reader: TiffReader<BufReader<File>> =
             TiffReader::new(BufReader::new(File::open(file_name)?))?;
         let dng: Dng = tiff_reader.read_dng()?;
-        for key in dng.ifd0.fields.keys() {
-            if let Some(field) = dng.ifd0.fields.get(key) {
-                println!("Tag: ifd0.{key:?}");
-                print_field(field);
+        for tag in dng.ifd0.fields.keys() {
+            dbg!(tag);
+            if let Some(field) = dng.ifd0.fields.get(tag) {
+                dbg!(field);
             }
         }
         // TODO
@@ -42,18 +42,4 @@ fn main() -> Result<(), Error> {
         return Err(Error::new(InvalidData, "Please specify a file"));
     }
     Ok(())
-}
-
-pub fn print_field(field: &Field) {
-    match field {
-        Field::Byte(data) | Field::Undefined(data) => println!("Field value: {data:?}"),
-        Field::Ascii(data) => println!("Field value: {data:?}"),
-        Field::Short(data) => println!("Field value: {data:?}"),
-        Field::Long(data) => println!("Field value: {data:?}"),
-        Field::Sbyte(data) => println!("Field value: {data:?}"),
-        Field::Sshort(data) => println!("Field value: {data:?}"),
-        Field::Slong(data) => println!("Field value: {data:?}"),
-        Field::Float(data) => println!("Field value: {data:?}"),
-        Field::Double(data) => println!("Field value: {data:?}"),
-    }
 }
