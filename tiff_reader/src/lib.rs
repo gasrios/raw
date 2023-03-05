@@ -14,8 +14,8 @@
  */
 
 use data::{
-    type_size, Ascii, Byte, Double, Float, Long, Sbyte, Short, Slong, Sshort, Tag, Undefined,
-    ASCII, DOUBLE, FLOAT, LONG, SBYTE, SHORT, SLONG, SSHORT,
+    type_size, Byte, Double, Float, Long, Sbyte, Short, Slong, Sshort, Tag, Undefined, ASCII,
+    DOUBLE, FLOAT, LONG, SBYTE, SHORT, SLONG, SSHORT,
 };
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
@@ -52,7 +52,7 @@ pub struct Ifd {
 
 pub enum Field {
     Byte(Vec<Byte>),
-    Ascii(Vec<Ascii>),
+    Ascii(String),
     Short(Vec<Short>),
     Long(Vec<Long>),
     // TODO Rational(Vec<u8>),
@@ -354,7 +354,7 @@ impl<R: Read + Seek> TiffReader<R> {
 
         Ok(match type_ {
             // TODO
-            ASCII => to_ascii(buffer)?,
+            ASCII => to_ascii(&buffer)?,
             SHORT => to_short(buffer)?,
             LONG => to_long(buffer)?,
             SBYTE => to_sbyte(buffer)?,
@@ -362,6 +362,7 @@ impl<R: Read + Seek> TiffReader<R> {
             SLONG => to_slong(buffer)?,
             FLOAT => to_float(buffer)?,
             DOUBLE => to_double(buffer)?,
+            // Covers BYTE and UNDEFINED
             _ => Field::Byte(buffer),
         })
     }
@@ -453,8 +454,24 @@ impl<R: Read + Seek> TiffReader<R> {
 /// # Errors
 ///
 /// iff we can't generate a string from the given byte array
-pub fn to_ascii(buffer: Vec<u8>) -> Result<Field, Error> {
-    Ok(Field::Byte(buffer))
+///
+/// # Panics
+///
+/// iff `String::from_utf8()` panics
+pub fn to_ascii(buffer: &[u8]) -> Result<Field, Error> {
+    let mut lenght: usize = buffer.len();
+
+    // Trim null padded ASCII sequences. Can happen in proprietary tags.
+    for i in (0..buffer.len()).rev() {
+        if buffer[i] == 0 {
+            lenght -= 1;
+        } else {
+            break;
+        }
+    }
+    Ok(Field::Ascii(
+        String::from_utf8(buffer[..lenght].to_vec()).unwrap(),
+    ))
 }
 
 /// # Errors
