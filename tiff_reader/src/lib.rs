@@ -1,45 +1,42 @@
-/*
- * © 𝟐𝟎𝟐𝟑 𝐆𝐮𝐢𝐥𝐡𝐞𝐫𝐦𝐞 𝐑𝐢𝐨𝐬 𝐀𝐥𝐥 𝐑𝐢𝐠𝐡𝐭𝐬 𝐑𝐞𝐬𝐞𝐫𝐯𝐞𝐝
- *
- * 𝑇ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚 𝑖𝑠 𝑓𝑟𝑒𝑒 𝑠𝑜𝑓𝑡𝑤𝑎𝑟𝑒: 𝑦𝑜𝑢 𝑐𝑎𝑛 𝑟𝑒𝑑𝑖𝑠𝑡𝑟𝑖𝑏𝑢𝑡𝑒 𝑖𝑡 𝑎𝑛𝑑/𝑜𝑟 𝑚𝑜𝑑𝑖𝑓𝑦 𝑖𝑡 𝑢𝑛𝑑𝑒𝑟 𝑡ℎ𝑒 𝑡𝑒𝑟𝑚𝑠 𝑜𝑓 𝑡ℎ𝑒
- * 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑎𝑠 𝑝𝑢𝑏𝑙𝑖𝑠ℎ𝑒𝑑 𝑏𝑦 𝑡ℎ𝑒 𝐹𝑟𝑒𝑒 𝑆𝑜𝑓𝑡𝑤𝑎𝑟𝑒 𝐹𝑜𝑢𝑛𝑑𝑎𝑡𝑖𝑜𝑛, 𝑣𝑒𝑟𝑠𝑖𝑜𝑛 3 𝑜𝑓 𝑡ℎ𝑒
- * 𝐿𝑖𝑐𝑒𝑛𝑠𝑒.
- *
- * 𝑇ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚 𝑖𝑠 𝑑𝑖𝑠𝑡𝑟𝑖𝑏𝑢𝑡𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 ℎ𝑜𝑝𝑒 𝑡ℎ𝑎𝑡 𝑖𝑡 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑢𝑠𝑒𝑓𝑢𝑙, 𝑏𝑢𝑡 𝑊𝐼𝑇𝐻𝑂𝑈𝑇 𝐴𝑁𝑌 𝑊𝐴𝑅𝑅𝐴𝑁𝑇𝑌;
- * 𝑤𝑖𝑡ℎ𝑜𝑢𝑡 𝑒𝑣𝑒𝑛 𝑡ℎ𝑒 𝑖𝑚𝑝𝑙𝑖𝑒𝑑 𝑤𝑎𝑟𝑟𝑎𝑛𝑡𝑦 𝑜𝑓 𝑀𝐸𝑅𝐶𝐻𝐴𝑁𝑇𝐴𝐵𝐼𝐿𝐼𝑇𝑌 𝑜𝑟 𝐹𝐼𝑇𝑁𝐸𝑆𝑆 𝐹𝑂𝑅 𝐴 𝑃𝐴𝑅𝑇𝐼𝐶𝑈𝐿𝐴𝑅 𝑃𝑈𝑅𝑃𝑂𝑆𝐸. 𝑆𝑒𝑒
- * 𝑡ℎ𝑒 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑓𝑜𝑟 𝑚𝑜𝑟𝑒 𝑑𝑒𝑡𝑎𝑖𝑙𝑠.
- *
- * 𝑌𝑜𝑢 𝑠ℎ𝑜𝑢𝑙𝑑 ℎ𝑎𝑣𝑒 𝑟𝑒𝑐𝑒𝑖𝑣𝑒𝑑 𝑎 𝑐𝑜𝑝𝑦 𝑜𝑓 𝑡ℎ𝑒 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑎𝑙𝑜𝑛𝑔 𝑤𝑖𝑡ℎ 𝑡ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚. 𝐼𝑓
- * 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
- */
+// © 𝟐𝟎𝟐𝟑 𝐆𝐮𝐢𝐥𝐡𝐞𝐫𝐦𝐞 𝐑𝐢𝐨𝐬 𝐀𝐥𝐥 𝐑𝐢𝐠𝐡𝐭𝐬 𝐑𝐞𝐬𝐞𝐫𝐯𝐞𝐝
+//
+// 𝑇ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚 𝑖𝑠 𝑓𝑟𝑒𝑒 𝑠𝑜𝑓𝑡𝑤𝑎𝑟𝑒: 𝑦𝑜𝑢 𝑐𝑎𝑛 𝑟𝑒𝑑𝑖𝑠𝑡𝑟𝑖𝑏𝑢𝑡𝑒 𝑖𝑡 𝑎𝑛𝑑/𝑜𝑟 𝑚𝑜𝑑𝑖𝑓𝑦 𝑖𝑡 𝑢𝑛𝑑𝑒𝑟 𝑡ℎ𝑒 𝑡𝑒𝑟𝑚𝑠 𝑜𝑓 𝑡ℎ𝑒
+// 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑎𝑠 𝑝𝑢𝑏𝑙𝑖𝑠ℎ𝑒𝑑 𝑏𝑦 𝑡ℎ𝑒 𝐹𝑟𝑒𝑒 𝑆𝑜𝑓𝑡𝑤𝑎𝑟𝑒 𝐹𝑜𝑢𝑛𝑑𝑎𝑡𝑖𝑜𝑛, 𝑣𝑒𝑟𝑠𝑖𝑜𝑛 3 𝑜𝑓 𝑡ℎ𝑒
+// 𝐿𝑖𝑐𝑒𝑛𝑠𝑒.
+//
+// 𝑇ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚 𝑖𝑠 𝑑𝑖𝑠𝑡𝑟𝑖𝑏𝑢𝑡𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 ℎ𝑜𝑝𝑒 𝑡ℎ𝑎𝑡 𝑖𝑡 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑢𝑠𝑒𝑓𝑢𝑙, 𝑏𝑢𝑡 𝑊𝐼𝑇𝐻𝑂𝑈𝑇 𝐴𝑁𝑌 𝑊𝐴𝑅𝑅𝐴𝑁𝑇𝑌;
+// 𝑤𝑖𝑡ℎ𝑜𝑢𝑡 𝑒𝑣𝑒𝑛 𝑡ℎ𝑒 𝑖𝑚𝑝𝑙𝑖𝑒𝑑 𝑤𝑎𝑟𝑟𝑎𝑛𝑡𝑦 𝑜𝑓 𝑀𝐸𝑅𝐶𝐻𝐴𝑁𝑇𝐴𝐵𝐼𝐿𝐼𝑇𝑌 𝑜𝑟 𝐹𝐼𝑇𝑁𝐸𝑆𝑆 𝐹𝑂𝑅 𝐴 𝑃𝐴𝑅𝑇𝐼𝐶𝑈𝐿𝐴𝑅 𝑃𝑈𝑅𝑃𝑂𝑆𝐸. 𝑆𝑒𝑒
+// 𝑡ℎ𝑒 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑓𝑜𝑟 𝑚𝑜𝑟𝑒 𝑑𝑒𝑡𝑎𝑖𝑙𝑠.
+//
+// 𝑌𝑜𝑢 𝑠ℎ𝑜𝑢𝑙𝑑 ℎ𝑎𝑣𝑒 𝑟𝑒𝑐𝑒𝑖𝑣𝑒𝑑 𝑎 𝑐𝑜𝑝𝑦 𝑜𝑓 𝑡ℎ𝑒 𝐺𝑁𝑈 𝐺𝑒𝑛𝑒𝑟𝑎𝑙 𝑃𝑢𝑏𝑙𝑖𝑐 𝐿𝑖𝑐𝑒𝑛𝑠𝑒 𝑎𝑙𝑜𝑛𝑔 𝑤𝑖𝑡ℎ 𝑡ℎ𝑖𝑠 𝑝𝑟𝑜𝑔𝑟𝑎𝑚. 𝐼𝑓
+// 𝑛𝑜𝑡, 𝑠𝑒𝑒 ℎ𝑡𝑡𝑝://𝑤𝑤𝑤.𝑔𝑛𝑢.𝑜𝑟𝑔/𝑙𝑖𝑐𝑒𝑛𝑠𝑒𝑠/.
 
 use data::{
     type_size, Byte, Double, Float, Long, Sbyte, Short, Slong, Sshort, Tag, Undefined, ASCII,
-    DOUBLE, FLOAT, LONG, SBYTE, SHORT, SLONG, SSHORT,
+    DOUBLE, FLOAT, LONG, RATIONAL, SBYTE, SHORT, SLONG, SRATIONAL, SSHORT,
 };
+use num_rational::Ratio;
 use std::collections::HashMap;
 use std::io::{Error, ErrorKind, Read, Seek, SeekFrom};
 
-/*
- * 𝐅𝐫𝐨𝐦 𝐃𝐢𝐠𝐢𝐭𝐚𝐥 𝐍𝐞𝐠𝐚𝐭𝐢𝐯𝐞 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 𝟏.𝟒.𝟎.𝟎, 𝐩𝐚𝐠𝐞 𝟏𝟑
- *
- * 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑒 𝑢𝑠𝑒 𝑜𝑓 𝑆𝑢𝑏𝐼𝐹𝐷 𝑡𝑟𝑒𝑒𝑠, 𝑎𝑠 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛. 𝑆𝑢𝑏𝐼𝐹𝐷 𝑐ℎ𝑎𝑖𝑛𝑠
- * 𝑎𝑟𝑒 𝑛𝑜𝑡 𝑠𝑢𝑝𝑝𝑜𝑟𝑡𝑒𝑑.
- *
- * 𝑇ℎ𝑒 ℎ𝑖𝑔ℎ𝑒𝑠𝑡-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑎𝑛𝑑 𝑞𝑢𝑎𝑙𝑖𝑡𝑦 𝐼𝐹𝐷 𝑠ℎ𝑜𝑢𝑙𝑑 𝑢𝑠𝑒 𝑁𝑒𝑤𝑆𝑢𝑏𝐹𝑖𝑙𝑒𝑇𝑦𝑝𝑒 𝑒𝑞𝑢𝑎𝑙 𝑡𝑜 0. 𝑅𝑒𝑑𝑢𝑐𝑒𝑑 𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛
- * (𝑜𝑟 𝑞𝑢𝑎𝑙𝑖𝑡𝑦) 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙𝑠 𝑜𝑟 𝑝𝑟𝑒𝑣𝑖𝑒𝑤𝑠, 𝑖𝑓 𝑎𝑛𝑦, 𝑠ℎ𝑜𝑢𝑙𝑑 𝑢𝑠𝑒 𝑁𝑒𝑤𝑆𝑢𝑏𝐹𝑖𝑙𝑒𝑇𝑦𝑝𝑒 𝑒𝑞𝑢𝑎𝑙 𝑡𝑜 1 (𝑓𝑜𝑟 𝑎 𝑝𝑟𝑖𝑚𝑎𝑟𝑦
- * 𝑝𝑟𝑒𝑣𝑖𝑒𝑤) 𝑜𝑟 10001.𝐻 (𝑓𝑜𝑟 𝑎𝑛 𝑎𝑙𝑡𝑒𝑟𝑛𝑎𝑡𝑒 𝑝𝑟𝑒𝑣𝑖𝑒𝑤).
- *
- * 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠, 𝑏𝑢𝑡 𝑑𝑜𝑒𝑠 𝑛𝑜𝑡 𝑟𝑒𝑞𝑢𝑖𝑟𝑒, 𝑡ℎ𝑎𝑡 𝑡ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝐼𝐹𝐷 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎 𝑙𝑜𝑤-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙, 𝑎𝑠
- * 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛.
- *
- * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟏
- *
- * 𝐴 𝑆𝑢𝑏𝐼𝐹𝐷𝑠 𝑡𝑎𝑔 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷 𝑖𝑠 𝑢𝑠𝑒𝑑 𝑡𝑜 𝑝𝑜𝑖𝑛𝑡 𝑡𝑜 𝑡ℎ𝑒 𝑐𝑜𝑚𝑝𝑟𝑒𝑠𝑠𝑒𝑑 𝑓𝑢𝑙𝑙-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒. 𝐼𝑓 𝑡ℎ𝑒
- * 𝑓𝑢𝑙𝑙-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒 𝑖𝑠 𝑠𝑡𝑜𝑟𝑒𝑑 𝑢𝑛𝑐𝑜𝑚𝑝𝑟𝑒𝑠𝑠𝑒𝑑 𝑎𝑠 𝑎 𝑏𝑎𝑠𝑒𝑙𝑖𝑛𝑒-𝑟𝑒𝑎𝑑𝑎𝑏𝑙𝑒 𝑇𝐼𝐹𝐹 𝑖𝑚𝑎𝑔𝑒, 𝑡ℎ𝑒 𝑓𝑢𝑙𝑙-
- * 𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒 𝑐𝑜𝑢𝑙𝑑 𝑏𝑒 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷. 𝐻𝑜𝑤𝑒𝑣𝑒𝑟, 𝑇𝐼𝐹𝐹/𝐸𝑃 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑎𝑡 𝑎 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙
- * 𝑖𝑚𝑎𝑔𝑒 𝑏𝑒 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷.
- */
+// 𝐅𝐫𝐨𝐦 𝐃𝐢𝐠𝐢𝐭𝐚𝐥 𝐍𝐞𝐠𝐚𝐭𝐢𝐯𝐞 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 𝟏.𝟒.𝟎.𝟎, 𝐩𝐚𝐠𝐞 𝟏𝟑
+//
+// 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑒 𝑢𝑠𝑒 𝑜𝑓 𝑆𝑢𝑏𝐼𝐹𝐷 𝑡𝑟𝑒𝑒𝑠, 𝑎𝑠 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛. 𝑆𝑢𝑏𝐼𝐹𝐷 𝑐ℎ𝑎𝑖𝑛𝑠
+// 𝑎𝑟𝑒 𝑛𝑜𝑡 𝑠𝑢𝑝𝑝𝑜𝑟𝑡𝑒𝑑.
+//
+// 𝑇ℎ𝑒 ℎ𝑖𝑔ℎ𝑒𝑠𝑡-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑎𝑛𝑑 𝑞𝑢𝑎𝑙𝑖𝑡𝑦 𝐼𝐹𝐷 𝑠ℎ𝑜𝑢𝑙𝑑 𝑢𝑠𝑒 𝑁𝑒𝑤𝑆𝑢𝑏𝐹𝑖𝑙𝑒𝑇𝑦𝑝𝑒 𝑒𝑞𝑢𝑎𝑙 𝑡𝑜 0. 𝑅𝑒𝑑𝑢𝑐𝑒𝑑 𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛
+// (𝑜𝑟 𝑞𝑢𝑎𝑙𝑖𝑡𝑦) 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙𝑠 𝑜𝑟 𝑝𝑟𝑒𝑣𝑖𝑒𝑤𝑠, 𝑖𝑓 𝑎𝑛𝑦, 𝑠ℎ𝑜𝑢𝑙𝑑 𝑢𝑠𝑒 𝑁𝑒𝑤𝑆𝑢𝑏𝐹𝑖𝑙𝑒𝑇𝑦𝑝𝑒 𝑒𝑞𝑢𝑎𝑙 𝑡𝑜 1 (𝑓𝑜𝑟 𝑎 𝑝𝑟𝑖𝑚𝑎𝑟𝑦
+// 𝑝𝑟𝑒𝑣𝑖𝑒𝑤) 𝑜𝑟 10001.𝐻 (𝑓𝑜𝑟 𝑎𝑛 𝑎𝑙𝑡𝑒𝑟𝑛𝑎𝑡𝑒 𝑝𝑟𝑒𝑣𝑖𝑒𝑤).
+//
+// 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠, 𝑏𝑢𝑡 𝑑𝑜𝑒𝑠 𝑛𝑜𝑡 𝑟𝑒𝑞𝑢𝑖𝑟𝑒, 𝑡ℎ𝑎𝑡 𝑡ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝐼𝐹𝐷 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎 𝑙𝑜𝑤-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙, 𝑎𝑠
+// 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛.
+//
+// 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟏
+//
+// 𝐴 𝑆𝑢𝑏𝐼𝐹𝐷𝑠 𝑡𝑎𝑔 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷 𝑖𝑠 𝑢𝑠𝑒𝑑 𝑡𝑜 𝑝𝑜𝑖𝑛𝑡 𝑡𝑜 𝑡ℎ𝑒 𝑐𝑜𝑚𝑝𝑟𝑒𝑠𝑠𝑒𝑑 𝑓𝑢𝑙𝑙-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒. 𝐼𝑓 𝑡ℎ𝑒
+// 𝑓𝑢𝑙𝑙-𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒 𝑖𝑠 𝑠𝑡𝑜𝑟𝑒𝑑 𝑢𝑛𝑐𝑜𝑚𝑝𝑟𝑒𝑠𝑠𝑒𝑑 𝑎𝑠 𝑎 𝑏𝑎𝑠𝑒𝑙𝑖𝑛𝑒-𝑟𝑒𝑎𝑑𝑎𝑏𝑙𝑒 𝑇𝐼𝐹𝐹 𝑖𝑚𝑎𝑔𝑒, 𝑡ℎ𝑒 𝑓𝑢𝑙𝑙-
+// 𝑟𝑒𝑠𝑜𝑙𝑢𝑡𝑖𝑜𝑛 𝑖𝑚𝑎𝑔𝑒 𝑐𝑜𝑢𝑙𝑑 𝑏𝑒 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷. 𝐻𝑜𝑤𝑒𝑣𝑒𝑟, 𝑇𝐼𝐹𝐹/𝐸𝑃 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑎𝑡 𝑎 𝑡ℎ𝑢𝑚𝑏𝑛𝑎𝑖𝑙
+// 𝑖𝑚𝑎𝑔𝑒 𝑏𝑒 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 0𝑡ℎ 𝐼𝐹𝐷.
 pub struct Dng {
     pub ifd0: Ifd,
     pub hires_ifd: Ifd,
@@ -56,12 +53,12 @@ pub enum Field {
     Ascii(String),
     Short(Vec<Short>),
     Long(Vec<Long>),
-    // TODO Rational(Vec<u8>),
+    Rational(Vec<Ratio<Long>>),
     Sbyte(Vec<Sbyte>),
     Undefined(Vec<Undefined>),
     Sshort(Vec<Sshort>),
     Slong(Vec<Slong>),
-    // TODO Srational(Vec<u8>),
+    Srational(Vec<Ratio<Slong>>),
     Float(Vec<Float>),
     Double(Vec<Double>),
 }
@@ -88,6 +85,10 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
+    /*********************************************************************************************
+     *                        Methods that read high level data structures                       *
+     *********************************************************************************************/
+
     /// # Panics
     ///
     /// Only when underlying reader panics
@@ -100,12 +101,10 @@ impl<R: Read + Seek> TiffReader<R> {
 
         let ifd0 = self.process_ifd(offset)?;
 
-        /*
-         * 𝐅𝐫𝐨𝐦 𝐃𝐢𝐠𝐢𝐭𝐚𝐥 𝐍𝐞𝐠𝐚𝐭𝐢𝐯𝐞 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 𝟏.𝟒.𝟎.𝟎, 𝐩𝐚𝐠𝐞 𝟏𝟑
-         *
-         * 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑒 𝑢𝑠𝑒 𝑜𝑓 𝑆𝑢𝑏𝐼𝐹𝐷 𝑡𝑟𝑒𝑒𝑠, 𝑎𝑠 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛.
-         * 𝑆𝑢𝑏𝐼𝐹𝐷 𝑐ℎ𝑎𝑖𝑛𝑠 𝑎𝑟𝑒 𝑛𝑜𝑡 𝑠𝑢𝑝𝑝𝑜𝑟𝑡𝑒𝑑.
-         */
+        // 𝐅𝐫𝐨𝐦 𝐃𝐢𝐠𝐢𝐭𝐚𝐥 𝐍𝐞𝐠𝐚𝐭𝐢𝐯𝐞 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐕𝐞𝐫𝐬𝐢𝐨𝐧 𝟏.𝟒.𝟎.𝟎, 𝐩𝐚𝐠𝐞 𝟏𝟑
+        //
+        // 𝐷𝑁𝐺 𝑟𝑒𝑐𝑜𝑚𝑚𝑒𝑛𝑑𝑠 𝑡ℎ𝑒 𝑢𝑠𝑒 𝑜𝑓 𝑆𝑢𝑏𝐼𝐹𝐷 𝑡𝑟𝑒𝑒𝑠, 𝑎𝑠 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹-𝐸𝑃 𝑠𝑝𝑒𝑐𝑖𝑓𝑖𝑐𝑎𝑡𝑖𝑜𝑛.
+        // 𝑆𝑢𝑏𝐼𝐹𝐷 𝑐ℎ𝑎𝑖𝑛𝑠 𝑎𝑟𝑒 𝑛𝑜𝑡 𝑠𝑢𝑝𝑝𝑜𝑟𝑡𝑒𝑑.
         if ifd0.offset != 0 {
             return Err(Error::new(
                 ErrorKind::InvalidData,
@@ -116,17 +115,15 @@ impl<R: Read + Seek> TiffReader<R> {
         if let Some(field) = ifd0.fields.get(&Tag::SubIFDs) {
             if let Field::Long(sub_ifds) = field {
                 if sub_ifds.len() != 1 {
-                    /*
-                     * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟐
-                     *
-                     * 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑡ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑡ℎ𝑒 “𝑡𝑟𝑒𝑒𝑑” 𝐼𝐹𝐷 𝑖𝑡𝑠𝑒𝑙𝑓 𝑖𝑓 𝑁=1, 𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒 𝑡ℎ𝑒
-                     * 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑡𝑜 𝑒𝑎𝑐ℎ
-                     * 𝐼𝐹𝐷 𝑏𝑒𝑖𝑛𝑔 “𝑡𝑟𝑒𝑒𝑑” 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑐𝑢𝑟𝑟𝑒𝑛𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑖𝑠 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑁
-                     * 𝑒𝑛𝑡𝑟𝑖𝑒𝑠, 𝑖.𝑒. 𝑜𝑓𝑓𝑠𝑒𝑡 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑡𝑜 𝑁 𝐼𝐹𝐷𝑠. 𝑪𝒖𝒓𝒓𝒆𝒏𝒕𝒍𝒚, 𝑵=1, 𝒂𝒏𝒅 𝒕𝒉𝒆 𝑽𝒂𝒍𝒖𝒆 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒔
-                     * 𝒕𝒉𝒆 𝒐𝒇𝒇𝒔𝒆𝒕 𝒕𝒐 𝒕𝒉𝒆 𝑰𝑭𝑫 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒊𝒏𝒈 𝒕𝒉𝒆 𝒇𝒖𝒍𝒍 𝒓𝒆𝒔𝒐𝒍𝒖𝒕𝒊𝒐𝒏 𝒊𝒎𝒂𝒈𝒆.
-                     *
-                     * 𝑈𝑠𝑎𝑔𝑒: 𝐼𝐹𝐷0
-                     */
+                    // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅/𝐄𝐏, 𝐩𝐚𝐠𝐞 𝟏𝟐
+                    //
+                    // 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑡ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑡ℎ𝑒 “𝑡𝑟𝑒𝑒𝑑” 𝐼𝐹𝐷 𝑖𝑡𝑠𝑒𝑙𝑓 𝑖𝑓 𝑁=1, 𝑜𝑡ℎ𝑒𝑟𝑤𝑖𝑠𝑒 𝑡ℎ𝑒
+                    // 𝑉𝑎𝑙𝑢𝑒 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑡𝑜 𝑒𝑎𝑐ℎ
+                    // 𝐼𝐹𝐷 𝑏𝑒𝑖𝑛𝑔 “𝑡𝑟𝑒𝑒𝑑” 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑐𝑢𝑟𝑟𝑒𝑛𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑖𝑠 𝑎𝑟𝑟𝑎𝑦 𝑜𝑓 𝑜𝑓𝑓𝑠𝑒𝑡𝑠 𝑤𝑖𝑙𝑙 𝑐𝑜𝑛𝑡𝑎𝑖𝑛 𝑁
+                    // 𝑒𝑛𝑡𝑟𝑖𝑒𝑠, 𝑖.𝑒. 𝑜𝑓𝑓𝑠𝑒𝑡 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑡𝑜 𝑁 𝐼𝐹𝐷𝑠. 𝑪𝒖𝒓𝒓𝒆𝒏𝒕𝒍𝒚, 𝑵=1, 𝒂𝒏𝒅 𝒕𝒉𝒆 𝑽𝒂𝒍𝒖𝒆 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒔
+                    // 𝒕𝒉𝒆 𝒐𝒇𝒇𝒔𝒆𝒕 𝒕𝒐 𝒕𝒉𝒆 𝑰𝑭𝑫 𝒄𝒐𝒏𝒕𝒂𝒊𝒏𝒊𝒏𝒈 𝒕𝒉𝒆 𝒇𝒖𝒍𝒍 𝒓𝒆𝒔𝒐𝒍𝒖𝒕𝒊𝒐𝒏 𝒊𝒎𝒂𝒈𝒆.
+                    //
+                    // 𝑈𝑠𝑎𝑔𝑒: 𝐼𝐹𝐷0
                     return Err(Error::new(
                         ErrorKind::InvalidData,
                         "\"SubIFDs\" should only contain the offset to the IFD containing the full resolution image.",
@@ -154,24 +151,22 @@ impl<R: Read + Seek> TiffReader<R> {
     }
 
     fn process_header(&mut self) -> Result<u64, Error> {
-        /*
-         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
-         *
-         * 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐻𝑒𝑎𝑑𝑒𝑟
-         *
-         * 𝐴 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑏𝑒𝑔𝑖𝑛𝑠 𝑤𝑖𝑡ℎ 𝑎𝑛 8-𝑏𝑦𝑡𝑒 𝑖𝑚𝑎𝑔𝑒 𝑓𝑖𝑙𝑒 ℎ𝑒𝑎𝑑𝑒𝑟, 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔
-         * 𝑖𝑛𝑓𝑜𝑟𝑚𝑎𝑡𝑖𝑜𝑛:
-         *
-         * 𝐵𝑦𝑡𝑒𝑠 0-1: 𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑢𝑠𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒. 𝐿𝑒𝑔𝑎𝑙 𝑣𝑎𝑙𝑢𝑒𝑠 𝑎𝑟𝑒:
-         *            “𝐼𝐼” (4949.𝐻)
-         *            “𝑀𝑀” (4𝐷4𝐷.𝐻)
-         *
-         *            𝐼𝑛 𝑡ℎ𝑒 “𝐼𝐼” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒 𝑡𝑜
-         *            𝑡ℎ𝑒 𝑚𝑜𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠 𝑇ℎ𝑖𝑠 𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑
-         *            𝑙𝑖𝑡𝑡𝑙𝑒-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟. 𝐼𝑛 𝑡ℎ𝑒 “𝑀𝑀” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑚𝑜𝑠𝑡
-         *            𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑡𝑜 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠. 𝑇ℎ𝑖𝑠
-         *            𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑 𝑏𝑖𝑔-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟.
-         */
+        // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
+        //
+        // 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐻𝑒𝑎𝑑𝑒𝑟
+        //
+        // 𝐴 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑏𝑒𝑔𝑖𝑛𝑠 𝑤𝑖𝑡ℎ 𝑎𝑛 8-𝑏𝑦𝑡𝑒 𝑖𝑚𝑎𝑔𝑒 𝑓𝑖𝑙𝑒 ℎ𝑒𝑎𝑑𝑒𝑟, 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔
+        // 𝑖𝑛𝑓𝑜𝑟𝑚𝑎𝑡𝑖𝑜𝑛:
+        //
+        // 𝐵𝑦𝑡𝑒𝑠 0-1: 𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑢𝑠𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒. 𝐿𝑒𝑔𝑎𝑙 𝑣𝑎𝑙𝑢𝑒𝑠 𝑎𝑟𝑒:
+        //            “𝐼𝐼” (4949.𝐻)
+        //            “𝑀𝑀” (4𝐷4𝐷.𝐻)
+        //
+        //            𝐼𝑛 𝑡ℎ𝑒 “𝐼𝐼” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑡ℎ𝑒 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒 𝑡𝑜
+        //            𝑡ℎ𝑒 𝑚𝑜𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑏𝑦𝑡𝑒, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠 𝑇ℎ𝑖𝑠 𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑
+        //            𝑙𝑖𝑡𝑡𝑙𝑒-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟. 𝐼𝑛 𝑡ℎ𝑒 “𝑀𝑀” 𝑓𝑜𝑟𝑚𝑎𝑡, 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑓𝑟𝑜𝑚 𝑚𝑜𝑠𝑡
+        //            𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡 𝑡𝑜 𝑙𝑒𝑎𝑠𝑡 𝑠𝑖𝑔𝑛𝑖𝑓𝑖𝑐𝑎𝑛𝑡, 𝑓𝑜𝑟 𝑏𝑜𝑡ℎ 16-𝑏𝑖𝑡 𝑎𝑛𝑑 32-𝑏𝑖𝑡 𝑖𝑛𝑡𝑒𝑔𝑒𝑟𝑠. 𝑇ℎ𝑖𝑠
+        //            𝑖𝑠 𝑐𝑎𝑙𝑙𝑒𝑑 𝑏𝑖𝑔-𝑒𝑛𝑑𝑖𝑎𝑛 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟.
         let buffer: [u8; 2] = self.read_to_stack()?;
         if buffer[0] == 0x49 && buffer[1] == 0x49 {
             self.endianness = Endianness::LittleEndian;
@@ -187,12 +182,10 @@ impl<R: Read + Seek> TiffReader<R> {
             ));
         }
 
-        /*
-         * 𝐵𝑦𝑡𝑒𝑠 2-3: 𝐴𝑛 𝑎𝑟𝑏𝑖𝑡𝑟𝑎𝑟𝑦 𝑏𝑢𝑡 𝑐𝑎𝑟𝑒𝑓𝑢𝑙𝑙𝑦 𝑐ℎ𝑜𝑠𝑒𝑛 𝑛𝑢𝑚𝑏𝑒𝑟 (42) 𝑡ℎ𝑎𝑡 𝑓𝑢𝑟𝑡ℎ𝑒𝑟 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒
-         *            𝑓𝑖𝑙𝑒 𝑎𝑠 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒.
-         *
-         *            𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑑𝑒𝑝𝑒𝑛𝑑𝑠 𝑜𝑛 𝑡ℎ𝑒 𝑣𝑎𝑙𝑢𝑒 𝑜𝑓 𝐵𝑦𝑡𝑒𝑠 0-1.
-         */
+        // 𝐵𝑦𝑡𝑒𝑠 2-3: 𝐴𝑛 𝑎𝑟𝑏𝑖𝑡𝑟𝑎𝑟𝑦 𝑏𝑢𝑡 𝑐𝑎𝑟𝑒𝑓𝑢𝑙𝑙𝑦 𝑐ℎ𝑜𝑠𝑒𝑛 𝑛𝑢𝑚𝑏𝑒𝑟 (42) 𝑡ℎ𝑎𝑡 𝑓𝑢𝑟𝑡ℎ𝑒𝑟 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒
+        //            𝑓𝑖𝑙𝑒 𝑎𝑠 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒.
+        //
+        //            𝑇ℎ𝑒 𝑏𝑦𝑡𝑒 𝑜𝑟𝑑𝑒𝑟 𝑑𝑒𝑝𝑒𝑛𝑑𝑠 𝑜𝑛 𝑡ℎ𝑒 𝑣𝑎𝑙𝑢𝑒 𝑜𝑓 𝐵𝑦𝑡𝑒𝑠 0-1.
         let version: u16 = self.read_u16()?;
         if version != 42 {
             return Err(Error::new(
@@ -201,26 +194,22 @@ impl<R: Read + Seek> TiffReader<R> {
             ));
         }
 
-        /*
-         * 𝐵𝑦𝑡𝑒𝑠 4-7: 𝑇ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
-         *            𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦. 𝐼𝑛
-         *            𝑝𝑎𝑟𝑡𝑖𝑐𝑢𝑙𝑎𝑟, 𝑎𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑖𝑚𝑎𝑔𝑒 𝑑𝑎𝑡𝑎 𝑖𝑡 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑠.
-         *            𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑚𝑢𝑠𝑡 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑤ℎ𝑒𝑟𝑒𝑣𝑒𝑟 𝑡ℎ𝑒𝑦 𝑚𝑎𝑦 𝑙𝑒𝑎𝑑.
-         *
-         *            𝑇ℎ𝑒 𝑡𝑒𝑟𝑚 𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑢𝑠𝑒𝑑 𝑖𝑛 𝑡ℎ𝑖𝑠 𝑑𝑜𝑐𝑢𝑚𝑒𝑛𝑡 𝑡𝑜 𝑟𝑒𝑓𝑒𝑟 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
-         *            𝑤𝑖𝑡ℎ 𝑟𝑒𝑠𝑝𝑒𝑐𝑡 𝑡𝑜 𝑡ℎ𝑒 𝑏𝑒𝑔𝑖𝑛𝑛𝑖𝑛𝑔 𝑜𝑓 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒. 𝑇ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝑏𝑦𝑡𝑒 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒
-         *            ℎ𝑎𝑠 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 0.
-         */
+        // 𝐵𝑦𝑡𝑒𝑠 4-7: 𝑇ℎ𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝐼𝐹𝐷. 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
+        //            𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦. 𝐼𝑛
+        //            𝑝𝑎𝑟𝑡𝑖𝑐𝑢𝑙𝑎𝑟, 𝑎𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑖𝑚𝑎𝑔𝑒 𝑑𝑎𝑡𝑎 𝑖𝑡 𝑑𝑒𝑠𝑐𝑟𝑖𝑏𝑒𝑠.
+        //            𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑚𝑢𝑠𝑡 𝑓𝑜𝑙𝑙𝑜𝑤 𝑡ℎ𝑒 𝑝𝑜𝑖𝑛𝑡𝑒𝑟𝑠 𝑤ℎ𝑒𝑟𝑒𝑣𝑒𝑟 𝑡ℎ𝑒𝑦 𝑚𝑎𝑦 𝑙𝑒𝑎𝑑.
+        //
+        //            𝑇ℎ𝑒 𝑡𝑒𝑟𝑚 𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑖𝑠 𝑎𝑙𝑤𝑎𝑦𝑠 𝑢𝑠𝑒𝑑 𝑖𝑛 𝑡ℎ𝑖𝑠 𝑑𝑜𝑐𝑢𝑚𝑒𝑛𝑡 𝑡𝑜 𝑟𝑒𝑓𝑒𝑟 𝑡𝑜 𝑎 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛
+        //            𝑤𝑖𝑡ℎ 𝑟𝑒𝑠𝑝𝑒𝑐𝑡 𝑡𝑜 𝑡ℎ𝑒 𝑏𝑒𝑔𝑖𝑛𝑛𝑖𝑛𝑔 𝑜𝑓 𝑡ℎ𝑒 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒. 𝑇ℎ𝑒 𝑓𝑖𝑟𝑠𝑡 𝑏𝑦𝑡𝑒 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒
+        //            ℎ𝑎𝑠 𝑎𝑛 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 0.
         let offset: u64 = self.read_offset()?;
 
-        /*
-         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
-         *
-         * 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
-         *
-         * As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the
-         * file.
-         */
+        // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
+        //
+        // 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
+        //
+        // As a side effect, we also fail here if offset == 0, that is, there are no IFDs in the
+        // file.
         if offset < 8 {
             return Err(Error::new(
                 ErrorKind::InvalidData,
@@ -236,53 +225,41 @@ impl<R: Read + Seek> TiffReader<R> {
 
         let mut fields: HashMap<Tag, Field> = HashMap::<Tag, Field>::new();
 
-        /*
-         * Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
-         * meaning, this is sometimes confusing.
-         */
+        // Note: TIFF 6.0 Specification uses the terms "IFD Entry" and "field" with the same
+        // meaning, this is sometimes confusing.
 
-        /*
-         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
-         *
-         * 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
-         *
-         * 𝐴𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 (𝐼𝐹𝐷) 𝑐𝑜𝑛𝑠𝑖𝑠𝑡𝑠 𝑜𝑓 𝑎 2-𝑏𝑦𝑡𝑒 𝑐𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
-         * 𝑒𝑛𝑡𝑟𝑖𝑒𝑠 (𝑖.𝑒., 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑓𝑖𝑒𝑙𝑑𝑠), 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 𝑠𝑒𝑞𝑢𝑒𝑛𝑐𝑒 𝑜𝑓 12-𝑏𝑦𝑡𝑒 𝑓𝑖𝑒𝑙𝑑 𝑒𝑛𝑡𝑟𝑖𝑒𝑠,
-         * 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 4-𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑒𝑥𝑡 𝐼𝐹𝐷 (𝑜𝑟 0 𝑖𝑓 𝑛𝑜𝑛𝑒). (𝐷𝑜 𝑛𝑜𝑡 𝑓𝑜𝑟𝑔𝑒𝑡 𝑡𝑜 𝑤𝑟𝑖𝑡𝑒 𝑡ℎ𝑒
-         * 4 𝑏𝑦𝑡𝑒𝑠 𝑜𝑓 0 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 𝑙𝑎𝑠𝑡 𝐼𝐹𝐷.)
-         *
-         * 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
-         */
+        // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
+        //
+        // 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
+        //
+        // 𝐴𝑛 𝐼𝑚𝑎𝑔𝑒 𝐹𝑖𝑙𝑒 𝐷𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 (𝐼𝐹𝐷) 𝑐𝑜𝑛𝑠𝑖𝑠𝑡𝑠 𝑜𝑓 𝑎 2-𝑏𝑦𝑡𝑒 𝑐𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦
+        // 𝑒𝑛𝑡𝑟𝑖𝑒𝑠 (𝑖.𝑒., 𝑡ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑓𝑖𝑒𝑙𝑑𝑠), 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 𝑠𝑒𝑞𝑢𝑒𝑛𝑐𝑒 𝑜𝑓 12-𝑏𝑦𝑡𝑒 𝑓𝑖𝑒𝑙𝑑 𝑒𝑛𝑡𝑟𝑖𝑒𝑠,
+        // 𝑓𝑜𝑙𝑙𝑜𝑤𝑒𝑑 𝑏𝑦 𝑎 4-𝑏𝑦𝑡𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑛𝑒𝑥𝑡 𝐼𝐹𝐷 (𝑜𝑟 0 𝑖𝑓 𝑛𝑜𝑛𝑒). (𝐷𝑜 𝑛𝑜𝑡 𝑓𝑜𝑟𝑔𝑒𝑡 𝑡𝑜 𝑤𝑟𝑖𝑡𝑒 𝑡ℎ𝑒
+        // 4 𝑏𝑦𝑡𝑒𝑠 𝑜𝑓 0 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 𝑙𝑎𝑠𝑡 𝐼𝐹𝐷.)
+        //
+        // 𝑇ℎ𝑒𝑟𝑒 𝑚𝑢𝑠𝑡 𝑏𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 1 𝐼𝐹𝐷 𝑖𝑛 𝑎 𝑇𝐼𝐹𝐹 𝑓𝑖𝑙𝑒 𝑎𝑛𝑑 𝑒𝑎𝑐ℎ 𝐼𝐹𝐷 𝑚𝑢𝑠𝑡 ℎ𝑎𝑣𝑒 𝑎𝑡 𝑙𝑒𝑎𝑠𝑡 𝑜𝑛𝑒 𝑒𝑛𝑡𝑟𝑦.
         let number_of_fields: u16 = self.read_u16()?;
         for _i in 0..number_of_fields {
-            /*
-             * 𝐼𝐹𝐷 𝐸𝑛𝑡𝑟𝑦
-             *
-             * 𝐸𝑎𝑐ℎ 12-𝑏𝑦𝑡𝑒 𝐼𝐹𝐷 𝑒𝑛𝑡𝑟𝑦 ℎ𝑎𝑠 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔 𝑓𝑜𝑟𝑚𝑎𝑡:
-             *
-             * 𝐵𝑦𝑡𝑒𝑠 0-1 𝑇ℎ𝑒 𝑇𝑎𝑔 𝑡ℎ𝑎𝑡 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
-             */
+            // 𝐼𝐹𝐷 𝐸𝑛𝑡𝑟𝑦
+            //
+            // 𝐸𝑎𝑐ℎ 12-𝑏𝑦𝑡𝑒 𝐼𝐹𝐷 𝑒𝑛𝑡𝑟𝑦 ℎ𝑎𝑠 𝑡ℎ𝑒 𝑓𝑜𝑙𝑙𝑜𝑤𝑖𝑛𝑔 𝑓𝑜𝑟𝑚𝑎𝑡:
+            //
+            // 𝐵𝑦𝑡𝑒𝑠 0-1 𝑇ℎ𝑒 𝑇𝑎𝑔 𝑡ℎ𝑎𝑡 𝑖𝑑𝑒𝑛𝑡𝑖𝑓𝑖𝑒𝑠 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
             let tag: Tag = self.read_tag()?;
 
-            /*
-             * TODO we do not need to know or process all tags, remove the ones we don't care about
-             * uncomment this after testing is done.
+            // TODO we do not need to know or process all tags, remove the ones we don't care about
+            // uncomment this after testing is done.
             if tag == Tag::Unknown {
                 break;
             }
-             */
 
-            /*
-             * 𝐵𝑦𝑡𝑒𝑠 2-3 𝑇ℎ𝑒 𝑓𝑖𝑒𝑙𝑑 𝑇𝑦𝑝𝑒.
-             */
+            // 𝐵𝑦𝑡𝑒𝑠 2-3 𝑇ℎ𝑒 𝑓𝑖𝑒𝑙𝑑 𝑇𝑦𝑝𝑒.
             let type_: u16 = self.read_u16()?;
 
-            /*
-             * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
-             *
-             * 𝑊𝑎𝑟𝑛𝑖𝑛𝑔: 𝐼𝑡 𝑖𝑠 𝑝𝑜𝑠𝑠𝑖𝑏𝑙𝑒 𝑡ℎ𝑎𝑡 𝑜𝑡ℎ𝑒𝑟 𝑇𝐼𝐹𝐹 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒𝑠 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑎𝑑𝑑𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑢𝑡𝑢𝑟𝑒. 𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑠ℎ𝑜𝑢𝑙𝑑
-             *          𝑠𝑘𝑖𝑝 𝑜𝑣𝑒𝑟 𝑓𝑖𝑒𝑙𝑑𝑠 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑢𝑛𝑒𝑥𝑝𝑒𝑐𝑡𝑒𝑑 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒.
-             */
+            // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟒
+            //
+            // 𝑊𝑎𝑟𝑛𝑖𝑛𝑔: 𝐼𝑡 𝑖𝑠 𝑝𝑜𝑠𝑠𝑖𝑏𝑙𝑒 𝑡ℎ𝑎𝑡 𝑜𝑡ℎ𝑒𝑟 𝑇𝐼𝐹𝐹 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒𝑠 𝑤𝑖𝑙𝑙 𝑏𝑒 𝑎𝑑𝑑𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑢𝑡𝑢𝑟𝑒. 𝑅𝑒𝑎𝑑𝑒𝑟𝑠 𝑠ℎ𝑜𝑢𝑙𝑑
+            //          𝑠𝑘𝑖𝑝 𝑜𝑣𝑒𝑟 𝑓𝑖𝑒𝑙𝑑𝑠 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑖𝑛𝑔 𝑎𝑛 𝑢𝑛𝑒𝑥𝑝𝑒𝑐𝑡𝑒𝑑 𝑓𝑖𝑒𝑙𝑑 𝑡𝑦𝑝𝑒.
             if type_ < 1 {
                 return Err(Error::new(
                     ErrorKind::InvalidData,
@@ -293,9 +270,7 @@ impl<R: Read + Seek> TiffReader<R> {
                 break;
             }
 
-            /*
-             * 𝐵𝑦𝑡𝑒𝑠 4-7 𝑇ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑣𝑎𝑙𝑢𝑒𝑠, 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑖𝑛𝑑𝑖𝑐𝑎𝑡𝑒𝑑 𝑇𝑦𝑝𝑒.
-             */
+            // 𝐵𝑦𝑡𝑒𝑠 4-7 𝑇ℎ𝑒 𝑛𝑢𝑚𝑏𝑒𝑟 𝑜𝑓 𝑣𝑎𝑙𝑢𝑒𝑠, 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑖𝑛𝑑𝑖𝑐𝑎𝑡𝑒𝑑 𝑇𝑦𝑝𝑒.
             let count: u32 = self.read_u32()?;
 
             if count < 1 {
@@ -314,39 +289,31 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    fn read_tag(&mut self) -> Result<Tag, Error> {
-        Ok(Tag::new(self.read_u16()?))
-    }
-
     fn read_ifd_field(&mut self, type_: u16, count: u32) -> Result<Field, Error> {
         let size: usize =
-            type_size(type_) * <u32 as std::convert::TryInto<usize>>::try_into(count).unwrap();
+            type_size(type_)? * <u32 as std::convert::TryInto<usize>>::try_into(count).unwrap();
         let mut buffer: Vec<u8> = Vec::with_capacity(size);
         buffer.spare_capacity_mut();
         unsafe {
-            /*
-             * See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
-             * See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
-             *
-             * This is a Rust hack, but it is OK, because we do not read data until after we have
-             * written it, which we do below, before returning from this function.
-             */
+            // See https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec
+            // See https://doc.rust-lang.org/std/vec/struct.Vec.html#method.spare_capacity_mut
+            //
+            // This is a Rust hack, but it is OK, because we do not read data until after we have
+            // written it, which we do below, before returning from this function.
             buffer.set_len(size);
         }
 
-        /*
-         * 𝐵𝑦𝑡𝑒𝑠 8-11 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑜𝑟 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
-         *
-         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟓
-         *
-         * 𝑉𝑎𝑙𝑢𝑒/𝑂𝑓𝑓𝑠𝑒𝑡
-         *
-         * 𝑇𝑜 𝑠𝑎𝑣𝑒 𝑡𝑖𝑚𝑒 𝑎𝑛𝑑 𝑠𝑝𝑎𝑐𝑒 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑠 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑛𝑠𝑡𝑒𝑎𝑑 𝑜𝑓 𝑝𝑜𝑖𝑛𝑡𝑖𝑛𝑔 𝑡𝑜
-         * 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑓 𝑎𝑛𝑑 𝑜𝑛𝑙𝑦 𝑖𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑖𝑛𝑡𝑜 4 𝑏𝑦𝑡𝑒𝑠. 𝐼𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑠 𝑠ℎ𝑜𝑟𝑡𝑒𝑟 𝑡ℎ𝑎𝑛 4
-         * 𝑏𝑦𝑡𝑒𝑠, 𝑖𝑡 𝑖𝑠 𝑙𝑒𝑓𝑡-𝑗𝑢𝑠𝑡𝑖𝑓𝑖𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 4-𝑏𝑦𝑡𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑖.𝑒., 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒
-         * 𝑙𝑜𝑤𝑒𝑟-𝑛𝑢𝑚𝑏𝑒𝑟𝑒𝑑 𝑏𝑦𝑡𝑒𝑠. 𝑊ℎ𝑒𝑡ℎ𝑒𝑟 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑤𝑖𝑡ℎ𝑖𝑛 4 𝑏𝑦𝑡𝑒𝑠 𝑖𝑠 𝑑𝑒𝑡𝑒𝑟𝑚𝑖𝑛𝑒𝑑 𝑏𝑦 𝑡ℎ𝑒
-         * 𝑇𝑦𝑝𝑒 𝑎𝑛𝑑 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
-         */
+        // 𝐵𝑦𝑡𝑒𝑠 8-11 𝑇ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑜𝑓𝑓𝑠𝑒𝑡 (𝑖𝑛 𝑏𝑦𝑡𝑒𝑠) 𝑜𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑜𝑟 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
+        //
+        // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟓
+        //
+        // 𝑉𝑎𝑙𝑢𝑒/𝑂𝑓𝑓𝑠𝑒𝑡
+        //
+        // 𝑇𝑜 𝑠𝑎𝑣𝑒 𝑡𝑖𝑚𝑒 𝑎𝑛𝑑 𝑠𝑝𝑎𝑐𝑒 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡 𝑐𝑜𝑛𝑡𝑎𝑖𝑛𝑠 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑛𝑠𝑡𝑒𝑎𝑑 𝑜𝑓 𝑝𝑜𝑖𝑛𝑡𝑖𝑛𝑔 𝑡𝑜
+        // 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑓 𝑎𝑛𝑑 𝑜𝑛𝑙𝑦 𝑖𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑖𝑛𝑡𝑜 4 𝑏𝑦𝑡𝑒𝑠. 𝐼𝑓 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑖𝑠 𝑠ℎ𝑜𝑟𝑡𝑒𝑟 𝑡ℎ𝑎𝑛 4
+        // 𝑏𝑦𝑡𝑒𝑠, 𝑖𝑡 𝑖𝑠 𝑙𝑒𝑓𝑡-𝑗𝑢𝑠𝑡𝑖𝑓𝑖𝑒𝑑 𝑤𝑖𝑡ℎ𝑖𝑛 𝑡ℎ𝑒 4-𝑏𝑦𝑡𝑒 𝑉𝑎𝑙𝑢𝑒 𝑂𝑓𝑓𝑠𝑒𝑡, 𝑖.𝑒., 𝑠𝑡𝑜𝑟𝑒𝑑 𝑖𝑛 𝑡ℎ𝑒
+        // 𝑙𝑜𝑤𝑒𝑟-𝑛𝑢𝑚𝑏𝑒𝑟𝑒𝑑 𝑏𝑦𝑡𝑒𝑠. 𝑊ℎ𝑒𝑡ℎ𝑒𝑟 𝑡ℎ𝑒 𝑉𝑎𝑙𝑢𝑒 𝑓𝑖𝑡𝑠 𝑤𝑖𝑡ℎ𝑖𝑛 4 𝑏𝑦𝑡𝑒𝑠 𝑖𝑠 𝑑𝑒𝑡𝑒𝑟𝑚𝑖𝑛𝑒𝑑 𝑏𝑦 𝑡ℎ𝑒
+        // 𝑇𝑦𝑝𝑒 𝑎𝑛𝑑 𝐶𝑜𝑢𝑛𝑡 𝑜𝑓 𝑡ℎ𝑒 𝑓𝑖𝑒𝑙𝑑.
         if size > 4 {
             let offset: u64 = self.read_offset()?;
             let current_offset: u64 = self.reader.stream_position()?;
@@ -360,30 +327,37 @@ impl<R: Read + Seek> TiffReader<R> {
         }
 
         Ok(match type_ {
-            // TODO
             ASCII => to_ascii_field(&buffer),
-            SHORT => self.to_short_field(&buffer)?,
-            LONG => self.to_long_field(&buffer)?,
-            SBYTE => self.to_sbyte_field(&buffer)?,
-            SSHORT => self.to_sshort_field(&buffer)?,
-            SLONG => self.to_slong_field(&buffer)?,
-            FLOAT => self.to_float_field(&buffer)?,
             DOUBLE => self.to_double_field(&buffer)?,
-            // Covers BYTE and UNDEFINED
+            FLOAT => self.to_float_field(&buffer)?,
+            LONG => self.to_long_field(&buffer)?,
+            RATIONAL => self.to_rational_field(&buffer)?,
+            SBYTE => self.to_sbyte_field(&buffer)?,
+            SHORT => self.to_short_field(&buffer)?,
+            SLONG => self.to_slong_field(&buffer)?,
+            SRATIONAL => self.to_srational_field(&buffer)?,
+            SSHORT => self.to_sshort_field(&buffer)?,
+            // BYTE, UNDEFINED and unknown types just return an array of bytes
             _ => Field::Byte(buffer),
         })
+    }
+
+    /*********************************************************************************************
+     *                             Methods that read data from file                              *
+     *********************************************************************************************/
+
+    fn read_tag(&mut self) -> Result<Tag, Error> {
+        Ok(Tag::new(self.read_u16()?))
     }
 
     fn read_offset(&mut self) -> Result<u64, Error> {
         // TIFF uses 32 bit for offsets, but std::io::Seek expects 64 bits
         let offset: u64 = u64::from(self.read_u32()?);
 
-        /*
-         * 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
-         *
-         * 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑
-         * 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦.
-         */
+        // 𝐅𝐫𝐨𝐦 𝐓𝐈𝐅𝐅 𝟔.𝟎 𝐒𝐩𝐞𝐜𝐢𝐟𝐢𝐜𝐚𝐭𝐢𝐨𝐧, 𝐩𝐚𝐠𝐞 𝟏𝟑
+        //
+        // 𝑇ℎ𝑒 𝑑𝑖𝑟𝑒𝑐𝑡𝑜𝑟𝑦 𝑚𝑎𝑦 𝑏𝑒 𝑎𝑡 𝑎𝑛𝑦 𝑙𝑜𝑐𝑎𝑡𝑖𝑜𝑛 𝑖𝑛 𝑡ℎ𝑒 𝑓𝑖𝑙𝑒 𝑎𝑓𝑡𝑒𝑟 𝑡ℎ𝑒 ℎ𝑒𝑎𝑑𝑒𝑟 𝑏𝑢𝑡 𝑚𝑢𝑠𝑡 𝑏𝑒𝑔𝑖𝑛 𝑜𝑛 𝑎 𝑤𝑜𝑟𝑑
+        // 𝑏𝑜𝑢𝑛𝑑𝑎𝑟𝑦.
         if offset % 2 == 1 {
             return Err(Error::new(
                 ErrorKind::InvalidData,
@@ -421,12 +395,10 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    /*
-     * This may be overoptimizing, but I already had a function to read fixed size arrays before I
-     * realized I would also need one to read vectors.
-     *
-     * I may remove this function in case it looks like it became redundant and offers no benefit.
-     */
+    // This may be overoptimizing, but I already had a function to read fixed size arrays before I
+    // realized I would also need one to read vectors.
+    //
+    // I may remove this function in case it looks like it became redundant and offers no benefit.
     fn read_to_stack<const SIZE: usize>(&mut self) -> Result<[u8; SIZE], Error> {
         let mut buffer: [u8; SIZE] = [0u8; SIZE];
         self.read_to(&mut buffer)?;
@@ -447,37 +419,32 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(())
     }
 
-    fn to_short_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(SHORT);
+    /*********************************************************************************************
+     *                         Methods that convert byte arrays to Fields                        *
+     *********************************************************************************************/
 
-        let mut data: Vec<Short> = Vec::<Short>::new();
+    fn to_double_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(DOUBLE)?;
+
+        let mut data: Vec<Double> = Vec::<Double>::new();
         for i in 0..buffer.len() / size {
-            data.push(self.to_short(&buffer[size * i..size * i + size])?);
+            data.push(self.to_double(&buffer[size * i..size * i + size])?);
         }
-        Ok(Field::Short(data))
+        Ok(Field::Double(data))
     }
 
-    fn to_short(&self, buffer: &[u8]) -> Result<Short, Error> {
-        if buffer.len() != 2 {
-            return Err(Error::new(
-                ErrorKind::Other,
-                format!("Wrong array size for short: {}", buffer.len()),
-            ));
+    fn to_float_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(FLOAT)?;
+
+        let mut data: Vec<Float> = Vec::<Float>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_float(&buffer[size * i..size * i + size])?);
         }
-        Ok(match self.endianness {
-            Endianness::LittleEndian => Short::from_le_bytes([buffer[0], buffer[1]]),
-            Endianness::BigEndian => Short::from_be_bytes([buffer[0], buffer[1]]),
-            Endianness::Uninitialized => {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "TiffReader was not initialized correctly before read attempt",
-                ))
-            }
-        })
+        Ok(Field::Float(data))
     }
 
     fn to_long_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(LONG);
+        let size: usize = type_size(LONG)?;
 
         let mut data: Vec<Long> = Vec::<Long>::new();
         for i in 0..buffer.len() / size {
@@ -486,31 +453,18 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(Field::Long(data))
     }
 
-    fn to_long(&self, buffer: &[u8]) -> Result<Long, Error> {
-        if buffer.len() != 4 {
-            return Err(Error::new(
-                ErrorKind::Other,
-                format!("Wrong array size for long: {}", buffer.len()),
-            ));
+    fn to_rational_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(RATIONAL)?;
+
+        let mut data: Vec<num_rational::Ratio<Long>> = Vec::<num_rational::Ratio<Long>>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_rational(&buffer[size * i..size * i + size])?);
         }
-        Ok(match self.endianness {
-            Endianness::LittleEndian => {
-                Long::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
-            }
-            Endianness::BigEndian => {
-                Long::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
-            }
-            Endianness::Uninitialized => {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "TiffReader was not initialized correctly before read attempt",
-                ))
-            }
-        })
+        Ok(Field::Rational(data))
     }
 
     fn to_sbyte_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(SBYTE);
+        let size: usize = type_size(SBYTE)?;
 
         let mut data: Vec<Sbyte> = Vec::<Sbyte>::new();
         for i in 0..buffer.len() / size {
@@ -519,56 +473,18 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(Field::Sbyte(data))
     }
 
-    fn to_sbyte(&self, buffer: &[u8]) -> Result<Sbyte, Error> {
-        if buffer.len() != 1 {
-            return Err(Error::new(
-                ErrorKind::Other,
-                format!("Wrong array size for sbyte: {}", buffer.len()),
-            ));
-        }
-        Ok(match self.endianness {
-            Endianness::LittleEndian => Sbyte::from_le_bytes([buffer[0]]),
-            Endianness::BigEndian => Sbyte::from_be_bytes([buffer[0]]),
-            Endianness::Uninitialized => {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "TiffReader was not initialized correctly before read attempt",
-                ))
-            }
-        })
-    }
+    fn to_short_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SHORT)?;
 
-    fn to_sshort_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(SSHORT);
-
-        let mut data: Vec<Sshort> = Vec::<Sshort>::new();
+        let mut data: Vec<Short> = Vec::<Short>::new();
         for i in 0..buffer.len() / size {
-            data.push(self.to_sshort(&buffer[size * i..size * i + size])?);
+            data.push(self.to_short(&buffer[size * i..size * i + size])?);
         }
-        Ok(Field::Sshort(data))
-    }
-
-    fn to_sshort(&self, buffer: &[u8]) -> Result<Sshort, Error> {
-        if buffer.len() != 2 {
-            return Err(Error::new(
-                ErrorKind::Other,
-                format!("Wrong array size for sshort: {}", buffer.len()),
-            ));
-        }
-        Ok(match self.endianness {
-            Endianness::LittleEndian => Sshort::from_le_bytes([buffer[0], buffer[1]]),
-            Endianness::BigEndian => Sshort::from_be_bytes([buffer[0], buffer[1]]),
-            Endianness::Uninitialized => {
-                return Err(Error::new(
-                    ErrorKind::Other,
-                    "TiffReader was not initialized correctly before read attempt",
-                ))
-            }
-        })
+        Ok(Field::Short(data))
     }
 
     fn to_slong_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(SLONG);
+        let size: usize = type_size(SLONG)?;
 
         let mut data: Vec<Slong> = Vec::<Slong>::new();
         for i in 0..buffer.len() / size {
@@ -577,20 +493,46 @@ impl<R: Read + Seek> TiffReader<R> {
         Ok(Field::Slong(data))
     }
 
-    fn to_slong(&self, buffer: &[u8]) -> Result<Slong, Error> {
-        if buffer.len() != 4 {
+    fn to_srational_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SRATIONAL)?;
+
+        let mut data: Vec<num_rational::Ratio<Slong>> = Vec::<num_rational::Ratio<Slong>>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_srational(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Srational(data))
+    }
+
+    fn to_sshort_field(&self, buffer: &[u8]) -> Result<Field, Error> {
+        let size: usize = type_size(SSHORT)?;
+
+        let mut data: Vec<Sshort> = Vec::<Sshort>::new();
+        for i in 0..buffer.len() / size {
+            data.push(self.to_sshort(&buffer[size * i..size * i + size])?);
+        }
+        Ok(Field::Sshort(data))
+    }
+
+    /*********************************************************************************************
+     *                         Methods that convert byte arrays to types                         *
+     *********************************************************************************************/
+
+    fn to_double(&self, buffer: &[u8]) -> Result<Double, Error> {
+        if buffer.len() != 8 {
             return Err(Error::new(
                 ErrorKind::Other,
-                format!("Wrong array size for slong: {}", buffer.len()),
+                format!("Wrong array size for float: {}", buffer.len()),
             ));
         }
         Ok(match self.endianness {
-            Endianness::LittleEndian => {
-                Slong::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
-            }
-            Endianness::BigEndian => {
-                Slong::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
-            }
+            Endianness::LittleEndian => Double::from_le_bytes([
+                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
+                buffer[7],
+            ]),
+            Endianness::BigEndian => Double::from_be_bytes([
+                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
+                buffer[7],
+            ]),
             Endianness::Uninitialized => {
                 return Err(Error::new(
                     ErrorKind::Other,
@@ -598,16 +540,6 @@ impl<R: Read + Seek> TiffReader<R> {
                 ))
             }
         })
-    }
-
-    fn to_float_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(FLOAT);
-
-        let mut data: Vec<Float> = Vec::<Float>::new();
-        for i in 0..buffer.len() / size {
-            data.push(self.to_float(&buffer[size * i..size * i + size])?);
-        }
-        Ok(Field::Float(data))
     }
 
     fn to_float(&self, buffer: &[u8]) -> Result<Float, Error> {
@@ -633,32 +565,151 @@ impl<R: Read + Seek> TiffReader<R> {
         })
     }
 
-    fn to_double_field(&self, buffer: &[u8]) -> Result<Field, Error> {
-        let size: usize = type_size(DOUBLE);
-
-        let mut data: Vec<Double> = Vec::<Double>::new();
-        for i in 0..buffer.len() / size {
-            data.push(self.to_double(&buffer[size * i..size * i + size])?);
-        }
-        Ok(Field::Double(data))
-    }
-
-    fn to_double(&self, buffer: &[u8]) -> Result<Double, Error> {
-        if buffer.len() != 8 {
+    fn to_long(&self, buffer: &[u8]) -> Result<Long, Error> {
+        if buffer.len() != 4 {
             return Err(Error::new(
                 ErrorKind::Other,
-                format!("Wrong array size for float: {}", buffer.len()),
+                format!("Wrong array size for long: {}", buffer.len()),
             ));
         }
         Ok(match self.endianness {
-            Endianness::LittleEndian => Double::from_le_bytes([
-                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
-                buffer[7],
-            ]),
-            Endianness::BigEndian => Double::from_be_bytes([
-                buffer[0], buffer[1], buffer[2], buffer[3], buffer[4], buffer[5], buffer[6],
-                buffer[7],
-            ]),
+            Endianness::LittleEndian => {
+                Long::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::BigEndian => {
+                Long::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_rational(&self, buffer: &[u8]) -> Result<Ratio<Long>, Error> {
+        if buffer.len() != 8 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for rational: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Ratio::new_raw(
+                Long::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]),
+                Long::from_le_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
+            ),
+            Endianness::BigEndian => Ratio::new_raw(
+                Long::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]),
+                Long::from_be_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
+            ),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_sbyte(&self, buffer: &[u8]) -> Result<Sbyte, Error> {
+        if buffer.len() != 1 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for sbyte: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Sbyte::from_le_bytes([buffer[0]]),
+            Endianness::BigEndian => Sbyte::from_be_bytes([buffer[0]]),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_short(&self, buffer: &[u8]) -> Result<Short, Error> {
+        // TODO compare to type_size(SHORT)
+        if buffer.len() != 2 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for short: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Short::from_le_bytes([buffer[0], buffer[1]]),
+            Endianness::BigEndian => Short::from_be_bytes([buffer[0], buffer[1]]),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_slong(&self, buffer: &[u8]) -> Result<Slong, Error> {
+        if buffer.len() != 4 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for slong: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => {
+                Slong::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::BigEndian => {
+                Slong::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]])
+            }
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_srational(&self, buffer: &[u8]) -> Result<Ratio<Slong>, Error> {
+        if buffer.len() != 8 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for srational: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Ratio::new_raw(
+                Slong::from_le_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]),
+                Slong::from_le_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
+            ),
+            Endianness::BigEndian => Ratio::new_raw(
+                Slong::from_be_bytes([buffer[0], buffer[1], buffer[2], buffer[3]]),
+                Slong::from_be_bytes([buffer[4], buffer[5], buffer[6], buffer[7]]),
+            ),
+            Endianness::Uninitialized => {
+                return Err(Error::new(
+                    ErrorKind::Other,
+                    "TiffReader was not initialized correctly before read attempt",
+                ))
+            }
+        })
+    }
+
+    fn to_sshort(&self, buffer: &[u8]) -> Result<Sshort, Error> {
+        if buffer.len() != 2 {
+            return Err(Error::new(
+                ErrorKind::Other,
+                format!("Wrong array size for sshort: {}", buffer.len()),
+            ));
+        }
+        Ok(match self.endianness {
+            Endianness::LittleEndian => Sshort::from_le_bytes([buffer[0], buffer[1]]),
+            Endianness::BigEndian => Sshort::from_be_bytes([buffer[0], buffer[1]]),
             Endianness::Uninitialized => {
                 return Err(Error::new(
                     ErrorKind::Other,
